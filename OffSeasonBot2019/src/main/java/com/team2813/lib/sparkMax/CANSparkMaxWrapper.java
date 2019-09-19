@@ -31,6 +31,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 		SparkMaxException.throwIfNotOk(subsystemName, error);
 	}
 
+	protected void throwIfNotOk(ParameterStatus error) throws SparkMaxException {
+		SparkMaxException.throwIfNotOk(subsystemName, error);
+	}
+
 	/**
 	 * TODO spark max doesn't have a way to get the last error thrown
 	 * Helper function for handling talon methods that do not return an error code but still need to check for one
@@ -366,6 +370,26 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public void setPIDIAccum(double iAccum) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setIAccum(iAccum));
+	}
+
+	//#endregion
+
+	//#region Parameter Config
+
+	public void setParam(ConfigParameter parameterID, double value) throws SparkMaxException {
+		throwIfNotOk(setParameter(parameterID, value));
+	}
+
+	public void setParam(ConfigParameter parameterID, int value) throws SparkMaxException {
+		throwIfNotOk(setParameter(parameterID, value));
+	}
+
+	public void setParam(ConfigParameter parameterID, boolean value) throws SparkMaxException {
+		throwIfNotOk(setParameter(parameterID, value));
+	}
+
+	public void setParamCore(ConfigParameter parameterID, ParameterType type, int value) throws SparkMaxException {
+		throwIfNotOk(setParameterCore(parameterID, type, value));
 	}
 
 	//#endregion
