@@ -21,7 +21,7 @@ public @interface Follower {
 
 	int id();
 
-	MotorType type() default MotorType.kBrushless;
+	MotorType type();
 
 	InvertType followMode() default InvertType.FOLLOW_LEADER;
 	

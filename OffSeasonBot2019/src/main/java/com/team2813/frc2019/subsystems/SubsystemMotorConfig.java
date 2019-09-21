@@ -39,7 +39,8 @@ public class SubsystemMotorConfig {
 		statusFrame = PeriodicFrame.kStatus2
 	)
 	@Follower(
-		id = 2
+		id = 2,
+		type = MotorType.kBrushless
 	)
 	static CANSparkMaxWrapper driveLeft;
 
@@ -60,7 +61,8 @@ public class SubsystemMotorConfig {
 		statusFrame = PeriodicFrame.kStatus2
 	)
 	@Follower(
-		id = 4
+		id = 4,
+		type = MotorType.kBrushless
 	)
 	static CANSparkMaxWrapper driveRight;
 
