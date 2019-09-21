@@ -19,13 +19,13 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubsystemMotorConfig {
+class SubsystemMotorConfig {
 
 
 	@SparkMaxOptions(
 		deviceNumber = 1,
 		type = MotorType.kBrushless,
-		subsystemName = "Drivetrain",
+		subsystemName = "Drive",
 		peakCurrentDuration = 0,
 		peakCurrentLimit = 0,
 		enableVoltageCompensation = true,
@@ -47,7 +47,7 @@ public class SubsystemMotorConfig {
 	@SparkMaxOptions(
 		deviceNumber = 3,
 		type = MotorType.kBrushless,
-		subsystemName = "Drivetrain",
+		subsystemName = "Drive",
 		peakCurrentDuration = 0,
 		peakCurrentLimit = 0,
 		enableVoltageCompensation = true,
