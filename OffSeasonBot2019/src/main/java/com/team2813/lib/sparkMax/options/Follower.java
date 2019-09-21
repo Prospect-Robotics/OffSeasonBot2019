@@ -1,5 +1,7 @@
 package com.team2813.lib.sparkMax.options;
 
+import com.revrobotics.CANSparkMaxLowLevel.*;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -18,6 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Follower {
 
 	int id();
+
+	MotorType type() default MotorType.kBrushless;
 
 	InvertType followMode() default InvertType.FOLLOW_LEADER;
 	

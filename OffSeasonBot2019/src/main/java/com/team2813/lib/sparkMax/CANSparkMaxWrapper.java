@@ -21,6 +21,19 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 	 *                 must be connected to their matching color and the hall sensor
 	 *                 plugged in. Brushed motors must be connected to the Red and
 	 */
+	public CANSparkMaxWrapper(int deviceID, String subsystemName, MotorType type) {
+		super(deviceID, type);
+		this.subsystemName = subsystemName;
+	}
+
+	/**
+	 * This constructor only for followers
+	 *
+	 * @param deviceID The device ID.
+	 * @param type     The motor type connected to the controller. Brushless motors
+	 *                 must be connected to their matching color and the hall sensor
+	 *                 plugged in. Brushed motors must be connected to the Red and
+	 */
 	public CANSparkMaxWrapper(int deviceID, MotorType type) {
 		super(deviceID, type);
 	}
@@ -226,6 +239,13 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public void setRef(double value, ControlType ctrl, int pidSlot, double arbFeedForward) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl, pidSlot, arbFeedForward));
+	}
+
+	public void setPIDF(int slotID, double p, double i, double d, double f) throws SparkMaxException {
+		setP(p, slotID);
+		setI(i, slotID);
+		setD(d, slotID);
+		setF(f, slotID);
 	}
 
 	public void setP(double gain) throws SparkMaxException {

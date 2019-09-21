@@ -1,6 +1,9 @@
 package com.team2813.lib.talon.options;
 
+import com.ctre.phoenix.motorcontrol.InvertType;
+
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -13,7 +16,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Followers {
+@Repeatable(Slaves.class)
+public @interface Slave {
 
-	Follower[] value();
+	int id();
+
+	InvertType followMode() default InvertType.FollowMaster;
+	
+	MotorControllerType motorControllerType() default MotorControllerType.VICTOR;
+	
+	public enum MotorControllerType{
+		TALON, VICTOR;
+	}
 }
