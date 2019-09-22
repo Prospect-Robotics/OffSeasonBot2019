@@ -7,9 +7,14 @@
 
 package com.team2813.frc2019;
 
+import com.team2813.frc2019.loops.Loop;
+import com.team2813.frc2019.subsystems.Drive;
+import com.team2813.lib.util.CrashTracker;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import static com.team2813.frc2019.subsystems.Subsystems.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,6 +28,15 @@ public class Robot extends TimedRobot {
 	private static final String kCustomAuto = "My Auto";
 	private String m_autoSelected;
 	private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+	private final Drive.TeleopDriveType teleopDriveType = Drive.TeleopDriveType.CURVATURE;
+
+
+	{
+		for (Loop subsystem : allSubsystems) {
+			LOOPER.addLoop(subsystem);
+		}
+	}
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -47,6 +61,18 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 	}
 
+	@Override
+	public void disabledInit() {
+		try {
+			CrashTracker.logDisabledInit();
+			LOOPER.setMode(RobotMode.DISABLED);
+			LOOPER.start();
+		} catch (Throwable t) {
+			CrashTracker.logThrowableCrash(t);
+			throw t;
+		}
+	}
+
 	/**
 	 * This autonomous (along with the chooser code above) shows how to select
 	 * between different autonomous modes using the dashboard. The sendable
@@ -63,6 +89,22 @@ public class Robot extends TimedRobot {
 		m_autoSelected = m_chooser.getSelected();
 		// m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
+	}
+
+	@Override
+	public void teleopInit() {
+		try {
+			CrashTracker.logTeleopInit();
+			LOOPER.setMode(RobotMode.ENABLED);
+			LOOPER.start();
+		} catch (Throwable t) {
+			CrashTracker.logThrowableCrash(t);
+			try {
+				throw t;
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -86,6 +128,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		DRIVE.teleopDrive(teleopDriveType);
 	}
 
 	/**
