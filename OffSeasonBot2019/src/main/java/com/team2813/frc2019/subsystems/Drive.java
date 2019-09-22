@@ -8,40 +8,40 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class Drive extends Subsystem {
 
+	// Motor Controllers
 	private static final CANSparkMaxWrapper LEFT = SubsystemMotorConfig.driveLeft;
 	private static final CANSparkMaxWrapper RIGHT = SubsystemMotorConfig.driveRight;
 	private double right_demand;
 	private double left_demand;
-
-	private static final double TELEOP_DEAD_ZONE = 0.01;
-	private static final Joystick joystick = SubsystemControlsConfig.driveJoystick;
-	private static final int X_AXIS = 0;
-	private static final int Y_AXIS_POS = 1;
-	private static final int Y_AXIS_NEG = 3;
-	private static final boolean PIVOT = false;
-
-	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
-
 	private boolean isBrakeMode;
+
+	// Controls
+	private static final double TELEOP_DEAD_ZONE = 0.01;
+	private static final Joystick JOYSTICK = SubsystemControlsConfig.driveJoystick;
+	private static final int X_AXIS = 0; // steer
+	private static final int Y_AXIS_POS = 1; // arcade drive y axis; curvature drive forward
+	private static final int Y_AXIS_NEG = 3; // curvature drive reverse
+	private static final boolean PIVOT = false; // for curvature drive
+	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
 
 	public enum TeleopDriveType {
 		ARCADE, CURVATURE
 	}
 
-	public void teleopDrive(TeleopDriveType driveType) {
+	private void teleopDrive(TeleopDriveType driveType) {
 		if (driveType == TeleopDriveType.ARCADE) {
-			arcadeDrive(joystick.getRawAxis(Y_AXIS_POS), joystick.getRawAxis(X_AXIS));
+			arcadeDrive(JOYSTICK.getRawAxis(Y_AXIS_POS), JOYSTICK.getRawAxis(X_AXIS));
 		} else if (driveType == TeleopDriveType.CURVATURE) {
 			curvatureDrive(Y_AXIS_POS, Y_AXIS_NEG, X_AXIS, PIVOT);
 		}
 	}
 
-	public void curvatureDrive(double throttleForward, double throttleBackward, double steerX, boolean pivot) {
+	private void curvatureDrive(double throttleForward, double throttleBackward, double steerX, boolean pivot) {
 		double throttle = throttleForward - throttleBackward;
 		arcadeDrive(pivot ? steerX: throttle * steerX , throttle);
 	}
 
-	public void arcadeDrive(double x, double y) {
+	private void arcadeDrive(double x, double y) {
 		double maxPercent = 1.0;
 		double throttleLeft = 0;
 		double throttleRight = 0;
