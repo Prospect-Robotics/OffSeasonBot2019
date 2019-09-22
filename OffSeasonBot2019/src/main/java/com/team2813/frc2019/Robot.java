@@ -9,6 +9,7 @@ package com.team2813.frc2019;
 
 import com.team2813.frc2019.loops.Loop;
 import com.team2813.frc2019.subsystems.Drive;
+import com.team2813.frc2019.subsystems.Subsystem;
 import com.team2813.lib.util.CrashTracker;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,13 +25,6 @@ import static com.team2813.frc2019.subsystems.Subsystems.*;
  * project.
  */
 public class Robot extends TimedRobot {
-	private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
-	private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-	private final Drive.TeleopDriveType teleopDriveType = Drive.TeleopDriveType.CURVATURE;
-
 
 	{
 		for (Loop subsystem : allSubsystems) {
@@ -44,9 +38,12 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-		m_chooser.addOption("My Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
+		try {
+			CrashTracker.logRobotInit();
+		} catch (Throwable t) {
+			CrashTracker.logThrowableCrash(t);
+			throw t;
+		}
 	}
 
 	/**
@@ -86,9 +83,12 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
-		// m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
+		try {
+			CrashTracker.logAutoInit();
+		} catch (Throwable t) {
+			CrashTracker.logThrowableCrash(t);
+			throw t;
+		}
 	}
 
 	@Override
@@ -112,15 +112,6 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-			default:
-				// Put default auto code here
-				break;
-		}
 	}
 
 	/**
@@ -128,7 +119,13 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		DRIVE.teleopDrive(teleopDriveType);
+		/*
+		 * this calls every subsystem's controls method which
+		 * should contain any code to invoke driver controls
+		 */
+		for (Subsystem subsystem : allSubsystems) {
+			subsystem.teleopControls();
+		}
 	}
 
 	/**

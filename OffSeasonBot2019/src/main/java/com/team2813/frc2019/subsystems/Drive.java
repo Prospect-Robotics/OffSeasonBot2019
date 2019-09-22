@@ -15,10 +15,12 @@ public class Drive extends Subsystem {
 
 	private static final double TELEOP_DEAD_ZONE = 0.01;
 	private static final Joystick joystick = SubsystemControlsConfig.driveJoystick;
-	private static final int xAxis = 0;
-	private static final int yAxisPos = 1;
-	private static final int yAxisNeg = 3;
-	private static final boolean pivot = false;
+	private static final int X_AXIS = 0;
+	private static final int Y_AXIS_POS = 1;
+	private static final int Y_AXIS_NEG = 3;
+	private static final boolean PIVOT = false;
+
+	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
 
 	private boolean isBrakeMode;
 
@@ -28,9 +30,9 @@ public class Drive extends Subsystem {
 
 	public void teleopDrive(TeleopDriveType driveType) {
 		if (driveType == TeleopDriveType.ARCADE) {
-			arcadeDrive(joystick.getRawAxis(yAxisPos), joystick.getRawAxis(xAxis));
+			arcadeDrive(joystick.getRawAxis(Y_AXIS_POS), joystick.getRawAxis(X_AXIS));
 		} else if (driveType == TeleopDriveType.CURVATURE) {
-			curvatureDrive(yAxisPos, yAxisNeg, xAxis, pivot);
+			curvatureDrive(Y_AXIS_POS, Y_AXIS_NEG, X_AXIS, PIVOT);
 		}
 	}
 
@@ -72,6 +74,11 @@ public class Drive extends Subsystem {
 	@Override
 	protected void outputTelemetry_() throws CTREException {
 
+	}
+
+	@Override
+	protected void teleopControls_() throws CTREException, SparkMaxException {
+		teleopDrive(TELEOP_DRIVE_TYPE);
 	}
 
 	@Override

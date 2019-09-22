@@ -1,9 +1,8 @@
 package com.team2813.frc2019.subsystems;
 
 import com.team2813.frc2019.loops.Loop;
+import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
-
-import edu.wpi.first.wpilibj.Solenoid;
 
 /**
  * The Subsystem abstract class, which serves as a basic framework for all robot subsystems. Each subsystem outputs
@@ -27,7 +26,7 @@ public abstract class Subsystem implements Loop {
 	 *
 	 * @throws CTREException
 	 */
-	protected void readPeriodicInputs_() throws CTREException {
+	protected void readPeriodicInputs_() throws CTREException, SparkMaxException {
 	}
 
 	/**
@@ -37,7 +36,7 @@ public abstract class Subsystem implements Loop {
 		try {
 			readPeriodicInputs_();
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -50,7 +49,7 @@ public abstract class Subsystem implements Loop {
 	 *
 	 * @throws CTREException
 	 */
-	protected void writePeriodicOutputs_() throws CTREException {
+	protected void writePeriodicOutputs_() throws CTREException, SparkMaxException {
 	}
 
 
@@ -61,7 +60,7 @@ public abstract class Subsystem implements Loop {
 		try {
 			writePeriodicOutputs_();
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -69,38 +68,38 @@ public abstract class Subsystem implements Loop {
 
 
 	// TODO remove checkSystem or use it for a good purpose
-	protected abstract boolean checkSystem_() throws CTREException;
+	protected abstract boolean checkSystem_() throws CTREException, SparkMaxException;
 
 	public final void checkSystem() {
 		try {
 			checkSystem_();
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	protected abstract void outputTelemetry_() throws CTREException;
+	protected abstract void outputTelemetry_() throws CTREException, SparkMaxException;
 
 	public final void outputTelemetry() {
 		try {
 			outputTelemetry_();
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	protected void zeroSensors_() throws CTREException {
+	protected void zeroSensors_() throws CTREException, SparkMaxException {
 	}
 
 	public final void zeroSensors() {
 		try {
 			zeroSensors_();
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -110,9 +109,19 @@ public abstract class Subsystem implements Loop {
 		System.exit(1);
 	}
 
+	protected abstract void teleopControls_() throws CTREException, SparkMaxException;
+
+	public final void teleopControls() {
+		try {
+			teleopControls_();
+		} catch (SparkMaxException | CTREException e) {
+			e.printStackTrace();
+		}
+	}
+
 	//#region Looping
 
-	protected abstract void onEnabledStart_(double timestamp) throws CTREException;
+	protected abstract void onEnabledStart_(double timestamp) throws CTREException, SparkMaxException;
 
 	@Override
 	public synchronized final void onEnabledStart(double timestamp) {
@@ -120,12 +129,12 @@ public abstract class Subsystem implements Loop {
 		try {
 			onEnabledStart_(timestamp);
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			e.printStackTrace();
 		}
 	}
 
-	protected abstract void onEnabledLoop_(double timestamp) throws CTREException;
+	protected abstract void onEnabledLoop_(double timestamp) throws CTREException, SparkMaxException;
 
 	@Override
 	public synchronized final void onEnabledLoop(double timestamp) {
@@ -134,37 +143,37 @@ public abstract class Subsystem implements Loop {
 			onEnabledLoop_(timestamp);
 			// System.out.println("Subsystem onEnabledLoop");
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			e.printStackTrace();
 		}
 		writePeriodicOutputs();
 	}
 
-	protected abstract void onEnabledStop_(double timestamp) throws CTREException;
+	protected abstract void onEnabledStop_(double timestamp) throws CTREException, SparkMaxException;
 
 	@Override
 	public synchronized final void onEnabledStop(double timestamp) {
 		try {
 			onEnabledStop_(timestamp);
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			e.printStackTrace();
 		}
 	}
 
-	protected void onDisabledStart_(double timestamp) throws CTREException {};
+	protected void onDisabledStart_(double timestamp) throws CTREException, SparkMaxException {};
 
 	@Override
 	public synchronized final void onDisabledStart(double timestamp) {
 		try {
 			onDisabledStart_(timestamp);
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			e.printStackTrace();
 		}
 	}
 
-	protected void onDisabledLoop_(double timestamp) throws CTREException {};
+	protected void onDisabledLoop_(double timestamp) throws CTREException, SparkMaxException {};
 
 	@Override
 	public synchronized final void onDisabledLoop(double timestamp) {
@@ -173,19 +182,19 @@ public abstract class Subsystem implements Loop {
 		try {
 			onDisabledLoop_(timestamp);
 		}
-		catch (CTREException e) {
+		catch (CTREException | SparkMaxException e) {
 			e.printStackTrace();
 		}
 		writePeriodicOutputs();
 	}
 
-	protected void onAnyLoop_(double timestamp) throws CTREException{}
+	protected void onAnyLoop_(double timestamp) throws CTREException, SparkMaxException {}
 
 	@Override
 	public synchronized final void onAnyLoop(double timestamp) {
 		try {
 			onAnyLoop_(timestamp);
-		} catch (CTREException e) {
+		} catch (CTREException | SparkMaxException e) {
 			e.printStackTrace();
 		}
 	}
