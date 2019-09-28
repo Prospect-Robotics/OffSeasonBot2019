@@ -19,8 +19,8 @@ public class Drive extends Subsystem {
 	private static final double TELEOP_DEAD_ZONE = 0.01;
 	private static final Joystick JOYSTICK = SubsystemControlsConfig.driveJoystick;
 	private static final int X_AXIS = 0; // steer
-	private static final int Y_AXIS_POS = 1; // arcade drive y axis; curvature drive forward
-	private static final int Y_AXIS_NEG = 3; // curvature drive reverse
+	private static final int Y_AXIS_POS = 3; // arcade drive y axis; curvature drive forward
+	private static final int Y_AXIS_NEG = 2; // curvature drive reverse
 	private static final boolean PIVOT = false; // for curvature drive
 	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
 
@@ -32,7 +32,7 @@ public class Drive extends Subsystem {
 		if (driveType == TeleopDriveType.ARCADE) {
 			arcadeDrive(JOYSTICK.getRawAxis(Y_AXIS_POS), JOYSTICK.getRawAxis(X_AXIS));
 		} else if (driveType == TeleopDriveType.CURVATURE) {
-			curvatureDrive(Y_AXIS_POS, Y_AXIS_NEG, X_AXIS, PIVOT);
+			curvatureDrive(JOYSTICK.getRawAxis(Y_AXIS_POS), JOYSTICK.getRawAxis(Y_AXIS_NEG), -JOYSTICK.getRawAxis(X_AXIS), PIVOT);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class Drive extends Subsystem {
 
 		System.out.println((throttleLeft - steer) + " " + (throttleLeft + steer));
 
-		left_demand = throttleLeft - steer;
+		left_demand = -(throttleLeft - steer);
 		right_demand = throttleRight + steer;
 	}
 
@@ -78,6 +78,7 @@ public class Drive extends Subsystem {
 
 	@Override
 	protected void teleopControls_() throws CTREException, SparkMaxException {
+//		System.out.println(JOYSTICK);
 		teleopDrive(TELEOP_DRIVE_TYPE);
 	}
 

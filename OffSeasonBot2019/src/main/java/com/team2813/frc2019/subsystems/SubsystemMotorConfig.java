@@ -23,28 +23,6 @@ class SubsystemMotorConfig {
 
 
 	@SparkMaxOptions(
-		deviceNumber = 1,
-		type = MotorType.kBrushless,
-		subsystemName = "Drive",
-		peakCurrentDuration = 0,
-		peakCurrentLimit = 0,
-		enableVoltageCompensation = true,
-		compSaturationVoltage = 12,
-		continuousCurrentLimitAmps = 30,
-		motionAcceleration = 0,
-		motionCruiseVelocity = 0,
-		closedLoopRampRate = 0,
-		openLoopRampRate = 0,
-		invertSensorPhase = true,
-		statusFrame = PeriodicFrame.kStatus2
-	)
-	@Follower(
-		id = 2,
-		type = MotorType.kBrushless
-	)
-	static CANSparkMaxWrapper driveLeft;
-
-	@SparkMaxOptions(
 		deviceNumber = 3,
 		type = MotorType.kBrushless,
 		subsystemName = "Drive",
@@ -62,6 +40,28 @@ class SubsystemMotorConfig {
 	)
 	@Follower(
 		id = 4,
+		type = MotorType.kBrushless
+	)
+	static CANSparkMaxWrapper driveLeft;
+
+	@SparkMaxOptions(
+		deviceNumber = 1,
+		type = MotorType.kBrushless,
+		subsystemName = "Drive",
+		peakCurrentDuration = 0,
+		peakCurrentLimit = 0,
+		enableVoltageCompensation = true,
+		compSaturationVoltage = 12,
+		continuousCurrentLimitAmps = 30,
+		motionAcceleration = 0,
+		motionCruiseVelocity = 0,
+		closedLoopRampRate = 0,
+		openLoopRampRate = 0,
+		invertSensorPhase = true,
+		statusFrame = PeriodicFrame.kStatus2
+	)
+	@Follower(
+		id = 2,
 		type = MotorType.kBrushless
 	)
 	static CANSparkMaxWrapper driveRight;
