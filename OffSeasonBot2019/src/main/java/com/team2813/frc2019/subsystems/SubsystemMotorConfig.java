@@ -22,6 +22,7 @@ import java.util.List;
 class SubsystemMotorConfig {
 
 
+	@com.team2813.lib.sparkMax.options.Inverted
 	@SparkMaxOptions(
 		deviceNumber = 3,
 		type = MotorType.kBrushless,
