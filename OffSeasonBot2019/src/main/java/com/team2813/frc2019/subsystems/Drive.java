@@ -22,7 +22,6 @@ public class Drive extends Subsystem {
 	private static final int Y_AXIS_POS = 3; // arcade drive y axis; curvature drive forward
 	private static final int Y_AXIS_NEG = 2; // curvature drive reverse
 	private static final int PIVOT_BUTTON_ID = 1;
-	private static boolean pivot = false; // for curvature drive
 	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
 
 	public enum TeleopDriveType {
