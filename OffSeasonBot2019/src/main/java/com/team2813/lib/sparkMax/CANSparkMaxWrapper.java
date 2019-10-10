@@ -215,6 +215,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 		throwIfNotOk(setEncPosition(position));
 	}
 
+	public double getEncoderPosition() {
+		return getEncoder().getPosition();
+	}
+
 	public void setIntegralAccumulator(double value) throws SparkMaxException {
 		throwIfNotOk(setIAccum(value));
 	}
@@ -229,15 +233,15 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region PID Controller
 
-	public void setRef(double value, ControlType ctrl) throws SparkMaxException {
+	public void set(double value, ControlType ctrl) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl));
 	}
 
-	public void setRef(double value, ControlType ctrl, int pidSlot) throws SparkMaxException {
+	public void set(double value, ControlType ctrl, int pidSlot) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl, pidSlot));
 	}
 
-	public void setRef(double value, ControlType ctrl, int pidSlot, double arbFeedForward) throws SparkMaxException {
+	public void set(double value, ControlType ctrl, int pidSlot, double arbFeedForward) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl, pidSlot, arbFeedForward));
 	}
 
