@@ -1,11 +1,12 @@
 package com.team2813.frc2019.config.motor;
 
-import com.revrobotics.CANSparkMaxLowLevel;
+
+import com.team2813.lib.sparkMax.options.InvertType;
 
 public class FollowerConfig {
     private int id;
-    private CANSparkMaxLowLevel.MotorType type;
-    private Inverted inverted;
+    private MotorType type;
+    private InvertType inverted = InvertType.FOLLOW_LEADER;
 
     public int getId() {
         return id;
@@ -15,19 +16,19 @@ public class FollowerConfig {
         this.id = id;
     }
 
-    public CANSparkMaxLowLevel.MotorType getType() {
+    public MotorType getType() {
         return type;
     }
 
-    public void setType(CANSparkMaxLowLevel.MotorType type) {
+    public void setType(MotorType type) {
         this.type = type;
     }
 
-    public Inverted getInverted() {
+    public InvertType getInverted() {
         return inverted;
     }
 
-    public void setInverted(Inverted inverted) {
+    public void setInverted(InvertType inverted) {
         this.inverted = inverted;
     }
 }

@@ -1,41 +1,169 @@
 package com.team2813.frc2019.config.motor;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import java.util.List;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
-@JsonRootName(value = "motors")
 public class MotorConfig {
 
-	private Map<String, Motor> motors;
+    private int deviceNumber;
+    private MotorType type;
+    private String subsystemName;
+    private int peakCurrentDuration;
+    private int peakCurrentLimit;
+    private boolean enableVoltageCompensation;
+    private int compSaturationVoltage;
+    private int continuousCurrentLimitAmps;
+    private int motionAcceleration;
+    private int motionCruiseVelocity;
+    private int closedLoopRampRate;
+    private int openLoopRampRate;
+    private boolean invertSensorPhase;
+    private PeriodicFrame statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
+    private int statusFramePeriod = 5;
+    private List<FollowerConfig> followers;
+    private Inverted inverted;
+    private List<PIDControllerConfig> pidControllers;
 
-	public Map<String, Motor> getMotors() {
-		return motors;
-	}
+    public int getDeviceNumber() {
+        return deviceNumber;
+    }
 
-	public void setMotors(Map<String, Motor> motors) {
-		this.motors = motors;
-	}
+    public void setDeviceNumber(int deviceNumber) {
+        this.deviceNumber = deviceNumber;
+    }
 
-	public static void main(String[] args) throws IOException {
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    public MotorType getType() {
+        return type;
+    }
 
-		String fileName = "motorConfig.yaml";
-		ClassLoader classLoader = MotorConfig.class.getClassLoader();
+    public void setType(MotorType type) {
+        this.type = type;
+    }
 
-		File file = new File(classLoader.getResource(fileName).getFile());
-		//File is found
-		System.out.println("File Found : " + file.exists());
+    public String getSubsystemName() {
+        return subsystemName;
+    }
 
-		//Read File Content
-//		String content = new String(Files.readAllBytes(file.toPath()));
-//		System.out.println(content);
+    public void setSubsystemName(String subsystemName) {
+        this.subsystemName = subsystemName;
+    }
 
-		MotorConfig order = mapper.readValue(file, MotorConfig.class);
-	}
+    public int getPeakCurrentDuration() {
+        return peakCurrentDuration;
+    }
 
+    public void setPeakCurrentDuration(int peakCurrentDuration) {
+        this.peakCurrentDuration = peakCurrentDuration;
+    }
+
+    public int getPeakCurrentLimit() {
+        return peakCurrentLimit;
+    }
+
+    public void setPeakCurrentLimit(int peakCurrentLimit) {
+        this.peakCurrentLimit = peakCurrentLimit;
+    }
+
+    public boolean isEnableVoltageCompensation() {
+        return enableVoltageCompensation;
+    }
+
+    public void setEnableVoltageCompensation(boolean enableVoltageCompensation) {
+        this.enableVoltageCompensation = enableVoltageCompensation;
+    }
+
+    public int getCompSaturationVoltage() {
+        return compSaturationVoltage;
+    }
+
+    public void setCompSaturationVoltage(int compSaturationVoltage) {
+        this.compSaturationVoltage = compSaturationVoltage;
+    }
+
+    public int getContinuousCurrentLimitAmps() {
+        return continuousCurrentLimitAmps;
+    }
+
+    public void setContinuousCurrentLimitAmps(int continuousCurrentLimitAmps) {
+        this.continuousCurrentLimitAmps = continuousCurrentLimitAmps;
+    }
+
+    public int getMotionAcceleration() {
+        return motionAcceleration;
+    }
+
+    public void setMotionAcceleration(int motionAcceleration) {
+        this.motionAcceleration = motionAcceleration;
+    }
+
+    public int getMotionCruiseVelocity() {
+        return motionCruiseVelocity;
+    }
+
+    public void setMotionCruiseVelocity(int motionCruiseVelocity) {
+        this.motionCruiseVelocity = motionCruiseVelocity;
+    }
+
+    public int getClosedLoopRampRate() {
+        return closedLoopRampRate;
+    }
+
+    public void setClosedLoopRampRate(int closedLoopRampRate) {
+        this.closedLoopRampRate = closedLoopRampRate;
+    }
+
+    public int getOpenLoopRampRate() {
+        return openLoopRampRate;
+    }
+
+    public void setOpenLoopRampRate(int openLoopRampRate) {
+        this.openLoopRampRate = openLoopRampRate;
+    }
+
+    public boolean isInvertSensorPhase() {
+        return invertSensorPhase;
+    }
+
+    public void setInvertSensorPhase(boolean invertSensorPhase) {
+        this.invertSensorPhase = invertSensorPhase;
+    }
+
+    public PeriodicFrame getStatusFrame() {
+        return this.statusFrame;
+    }
+
+    public void setStatusFrame(PeriodicFrame statusFrame) {
+        this.statusFrame = statusFrame;
+    }
+
+    public int getStatusFramePeriod() {
+        return statusFramePeriod;
+    }
+
+    public void setStatusFramePeriod(int statusFramePeriod) {
+        this.statusFramePeriod = statusFramePeriod;
+    }
+
+    public List<FollowerConfig> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<FollowerConfig> followers) {
+        this.followers = followers;
+    }
+
+    public Inverted getInverted() {
+        return inverted;
+    }
+
+    public void setInverted(Inverted inverted) {
+        this.inverted = inverted;
+    }
+
+    public List<PIDControllerConfig> getPidControllers() {
+        return pidControllers;
+    }
+
+    public void setPidControllers(List<PIDControllerConfig> pidControllers) {
+        this.pidControllers = pidControllers;
+    }
 }
