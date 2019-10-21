@@ -1,6 +1,7 @@
 package com.team2813.frc2019.subsystems;
 
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.ControlType;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
@@ -8,12 +9,21 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class Drive extends Subsystem {
 
+	// Physical Constants
+	private static final double WHEEL_DIAMETER_INCHES = 1.0; // TODO: 10/05/2019 correct number
+	private static final double WHEEL_CIRCUMFERENCE_INCHES = Math.PI * WHEEL_DIAMETER_INCHES;
+
 	// Motor Controllers
 	private static final CANSparkMaxWrapper LEFT = SubsystemMotorConfig.driveLeft;
 	private static final CANSparkMaxWrapper RIGHT = SubsystemMotorConfig.driveRight;
 	private double right_demand;
 	private double left_demand;
 	private boolean isBrakeMode;
+
+	// Encoders
+	private static final double ENCODER_TICKS_PER_REVOLUTION = 0.0; // TODO: 10/05/2019 replace with correct value
+	private static final double ENCODER_TICKS_PER_INCH = ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE_INCHES;
+	private static final double ENCODER_TICKS_PER_FOOT = ENCODER_TICKS_PER_INCH / 12;
 
 	// Controls
 	private static final double TELEOP_DEAD_ZONE = 0.01;
@@ -23,6 +33,19 @@ public class Drive extends Subsystem {
 	private static final int Y_AXIS_NEG = 2; // curvature drive reverse
 	private static final int PIVOT_BUTTON_ID = 1;
 	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
+	private static final int AUTO_BUTTON_ID = 2; // TODO: 10/05/2019 replace with correct button id
+
+	// Mode
+	private static DriveMode driveMode = DriveMode.OPEN_LOOP;
+
+	// Auto
+	private static final double ENCODER_TICKS_PER_DEGREE_TANK_TURN = 0.0; // TODO: 10/05/2019 need to find correct value using robot
+	private static boolean isAuto = false;
+	private static double limelightDegrees = 0.0; // TODO: 10/05/2019 replace with actual Limelight angle
+	private static final double ALLOWABLE_LIMELIGHT_ERROR = 0.0; // TODO: 10/05/2019 replace with actual allowable angle error
+	private static final double MIN_AUTO_POS_CHANGE = 0.0; // TODO: 10/05/2019 tune
+//	private static final double MIN_AUTO_SPEED_FPS = 0.33; // TODO: 10/05/2019 tune
+//	private static final double MIN_AUTO_SPEED_ENCODER_TICKS = MIN_AUTO_SPEED_FPS * ENCODER_TICKS_PER_FOOT;
 
 	public enum TeleopDriveType {
 		ARCADE, CURVATURE
@@ -69,6 +92,14 @@ public class Drive extends Subsystem {
 		right_demand = throttleRight - steer;
 	}
 
+	private void autoDrive(double angle) {
+		// If turning right, left moves forward and right moves backward
+		// If turning left, right moves forward and left moves backward
+		// TODO: 10/05/2019 I'm not sure this is right. I think there might be a better way to do it using trig.
+		left_demand = MIN_AUTO_POS_CHANGE + LEFT.getEncoderPosition() + (angle * ENCODER_TICKS_PER_DEGREE_TANK_TURN);
+		right_demand = MIN_AUTO_POS_CHANGE + RIGHT.getEncoderPosition() - (angle * ENCODER_TICKS_PER_DEGREE_TANK_TURN);
+	}
+
 	@Override
 	protected boolean checkSystem_() throws CTREException {
 		return false;
@@ -81,8 +112,16 @@ public class Drive extends Subsystem {
 
 	@Override
 	protected void teleopControls_() throws CTREException, SparkMaxException {
-//		System.out.println(JOYSTICK);
-		teleopDrive(TELEOP_DRIVE_TYPE);
+		if (!isAuto) {
+			driveMode = DriveMode.OPEN_LOOP;
+			teleopDrive(TELEOP_DRIVE_TYPE);
+		} else {
+			driveMode = DriveMode.SMART_MOTION;
+			if (JOYSTICK.getRawButtonPressed(AUTO_BUTTON_ID))
+				while (Math.abs(limelightDegrees) > ALLOWABLE_LIMELIGHT_ERROR) {
+					autoDrive(limelightDegrees);
+				}
+		}
 	}
 
 	@Override
@@ -98,9 +137,9 @@ public class Drive extends Subsystem {
 	protected void onEnabledStop_(double timestamp) throws CTREException {
 	}
 
-	protected synchronized void writePeriodicOutputs_() {
-		RIGHT.set(right_demand);
-		LEFT.set(left_demand);
+	protected synchronized void writePeriodicOutputs_() throws SparkMaxException {
+		RIGHT.set(right_demand, driveMode.controlType);
+		LEFT.set(left_demand, driveMode.controlType);
 	}
 
 	public synchronized void setBrakeMode(boolean brake) {
@@ -113,6 +152,18 @@ public class Drive extends Subsystem {
 			} catch (SparkMaxException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private enum DriveMode {
+		OPEN_LOOP(ControlType.kDutyCycle),
+		SMART_MOTION(ControlType.kSmartMotion),
+		VELOCITY(ControlType.kVelocity);
+
+		ControlType controlType;
+
+		DriveMode(ControlType controlType) {
+			this.controlType = controlType;
 		}
 	}
 }
