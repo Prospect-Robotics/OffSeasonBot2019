@@ -5,10 +5,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.team2813.frc2019.config.motor.FollowerConfig;
 import com.team2813.frc2019.config.motor.Inverted;
 import com.team2813.frc2019.config.motor.MotorConfig;
+import com.team2813.frc2019.config.motor.PIDControllerConfig;
 import com.team2813.lib.logging.LogLevel;
 import com.team2813.lib.logging.Logger;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
+import com.team2813.lib.sparkMax.options.PIDProfile;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import java.io.File;
@@ -107,7 +109,7 @@ class SubsystemMotorConfig {
         try {
             spark.factoryDefault();
 
-//					spark.setPeakCurrentDuration(options.peakCurrentDuration()); // FIXME: 09/20/2019 for the spark
+//			spark.setPeakCurrentDuration(options.peakCurrentDuration()); // FIXME: 09/20/2019 for the spark
             spark.setCurrLimit(options.getPeakCurrentLimit());
 
             spark.enableVoltageCompensation(options.getCompSaturationVoltage());
@@ -117,8 +119,8 @@ class SubsystemMotorConfig {
 
             spark.setPeriodicFrame(options.getStatusFrame().getValue(), options.getStatusFramePeriod());
 
-//					spark.setSmartMotionMaxVelocity(options.motionCruiseVelocity()); // FIXME: 09/20/2019 need to change parameters/types
-//					spark.setSmartMotionMaxAccel(options.motionAcceleration()); // FIXME: 09/20/2019 need to change parameters/types
+//			spark.setSmartMotionMaxVelocity(options.motionCruiseVelocity()); // FIXME: 09/20/2019 need to change parameters/types
+//			spark.setSmartMotionMaxAccel(options.motionAcceleration()); // FIXME: 09/20/2019 need to change parameters/types
 
 
             spark.setSecondaryCurrLimit(options.getContinuousCurrentLimitAmps());// TODO check this is actually continuous limit
@@ -135,10 +137,10 @@ class SubsystemMotorConfig {
 //			}
 
             // TODO Implement PID Controllers
-//			for (com.team2813.lib.sparkMax.options.PIDProfile profile : field.getAnnotationsByType(com.team2813.lib.sparkMax.options.PIDProfile.class)) {
-//				System.out.println("\tConfiguring pid profile " + profile.profile());
-//				spark.setPIDF(profile.profile().id, profile.p(), profile.i(), profile.d(), profile.f());
-//			}
+			for (PIDControllerConfig pidControllerConfig : options.getPidControllers()) {
+				System.out.println("\tConfiguring pid profile " + pidControllerConfig.getProfile());
+				spark.setPIDF(pidControllerConfig.getProfile().id, pidControllerConfig.getP(), pidControllerConfig.getI(), pidControllerConfig.getD(), pidControllerConfig.getF());
+			}
 
             Inverted inverted = options.getInverted();
             if (inverted != null)

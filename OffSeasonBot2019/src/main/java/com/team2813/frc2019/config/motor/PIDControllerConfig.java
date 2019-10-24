@@ -1,6 +1,9 @@
 package com.team2813.frc2019.config.motor;
 
+import com.team2813.lib.sparkMax.options.PIDProfile;
+
 public class PIDControllerConfig {
+    private PIDProfile.Profile profile;
     private double p;
     private double i;
     private double d;
@@ -8,6 +11,14 @@ public class PIDControllerConfig {
     private double maxIntegralAccumulator;
     private double integralZone;
     private double allowableClosedLoopError;
+
+    public PIDProfile.Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(PIDProfile.Profile profile) {
+        this.profile = profile;
+    }
 
     public double getP() {
         return p;

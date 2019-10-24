@@ -26,12 +26,6 @@ import static com.team2813.frc2019.subsystems.Subsystems.*;
  */
 public class Robot extends TimedRobot {
 
-	{
-		for (Loop subsystem : allSubsystems) {
-			LOOPER.addLoop(subsystem);
-		}
-	}
-
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -40,6 +34,9 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		try {
 			CrashTracker.logRobotInit();
+			for (Loop subsystem : allSubsystems) {
+				LOOPER.addLoop(subsystem);
+			}
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
