@@ -53,21 +53,34 @@ public class Drive extends Subsystem {
 //	private static final double MIN_AUTO_SPEED_ENCODER_TICKS = MIN_AUTO_SPEED_FPS * ENCODER_TICKS_PER_FOOT;
 	private static final double CORRECTION_MAX_STEER_SPEED = 0.5;
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry x = table.getEntry("tx");
+    NetworkTableEntry tx = table.getEntry("tx");
     NetworkTableEntry y = table.getEntry("ty");
+    NetworkTableEntry camtranEntry = table.getEntry("camtran");
 
     public enum TeleopDriveType {
         ARCADE, CURVATURE
     }
 
+    private double steerToAngle(double targetAngle) {
+        if (Math.abs(tx.getDouble(0) - targetAngle) > 1) {
+            double rawSteer = (tx.getDouble(0) - targetAngle) / 27;
+            return CORRECTION_MAX_STEER_SPEED * (rawSteer + .3);
+        }
+        return 0;
+    }
+
     private void teleopDrive(TeleopDriveType driveType) {
         // PATH CORRECTION
-		double correctionSteer = 0;
-		if (Math.abs(x.getDouble(0)) > 1) {
-			System.out.println(x.getDouble(0));
-			double rawSteer = x.getDouble(0) / 27;
-			correctionSteer = CORRECTION_MAX_STEER_SPEED * (rawSteer + .3);
-		}
+        double[] camtran = camtranEntry.getDoubleArray(new double[] {0,0,0,0,0,0});
+        double x = camtran[0];
+        double y = camtran[1];
+//        double yaw = camtran[3];
+		double targetAngle = 0;
+		if (Math.abs(x) > 6) {
+		    targetAngle = Math.toDegrees(Math.atan(y / x));
+        }
+        double correctionSteer = steerToAngle(targetAngle);
+        System.out.println("tx: " + tx.getDouble(0) + " x: " + x + " y: " + y);
 
 		if (JOYSTICK.getRawButton(AUTO_BUTTON_ID)) {
 			curvatureDrive(JOYSTICK.getRawAxis(Y_AXIS_POS), JOYSTICK.getRawAxis(Y_AXIS_NEG), correctionSteer, true);
