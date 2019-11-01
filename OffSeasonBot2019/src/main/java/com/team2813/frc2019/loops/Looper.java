@@ -1,4 +1,3 @@
-//Copyright (c) 2018 Team 254
 package com.team2813.frc2019.loops;
 
 import java.util.ArrayList;

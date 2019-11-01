@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.team2813.frc2019.config.motor.FollowerConfig;
 import com.team2813.frc2019.config.motor.Inverted;
 import com.team2813.frc2019.config.motor.MotorConfig;
+import com.team2813.frc2019.config.motor.PIDControllerConfig;
 import com.team2813.lib.logging.LogLevel;
 import com.team2813.lib.logging.Logger;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
@@ -70,6 +71,10 @@ class SubsystemMotorConfig {
 
     static CANSparkMaxWrapper driveLeft;
     static CANSparkMaxWrapper driveRight;
+    static CANSparkMaxWrapper mainIntakeWrist;
+    static CANSparkMaxWrapper mainIntakeWheel;
+    static CANSparkMaxWrapper groundIntakeArm;
+
 
     static List<Integer> sparkIds = new ArrayList<>();
 
@@ -83,6 +88,10 @@ class SubsystemMotorConfig {
 
             driveLeft = initializeSpark("driveLeft");
             driveRight = initializeSpark("driveRight");
+            mainIntakeWrist = initializeSpark("mainIntakeWrist");
+            mainIntakeWheel = initializeSpark("mainIntakeWheel");
+            groundIntakeArm = initializeSpark("groundIntakeArm");
+
         } catch (IOException e) {
             Logger.log(LogLevel.ERROR, "Unable to read config");
             e.printStackTrace();
@@ -125,7 +134,7 @@ class SubsystemMotorConfig {
 
 //			for (com.team2813.lib.sparkMax.options.HardLimitSwitch hardLimitSwitch : field.getAnnotationsByType(com.team2813.lib.sparkMax.options.HardLimitSwitch.class)) {
 //				System.out.println("\tconfiguring hard limit switch " + hardLimitSwitch.direction());
-//				// FIXME remake limit switch stuff differently since it is called differently
+//				// FIXME remake limit switch stuff differently since it is called differently -- Grady 10/30 I'm not sure this is how it works for Spark Maxs
 //			}
 //
 //			for (com.team2813.lib.sparkMax.options.SoftLimit softLimit : field.getAnnotationsByType(com.team2813.lib.sparkMax.options.SoftLimit.class)) {
@@ -134,11 +143,13 @@ class SubsystemMotorConfig {
 //				//FIXME remake limit switch stuff differently
 //			}
 
-            // TODO Implement PID Controllers
-//			for (com.team2813.lib.sparkMax.options.PIDProfile profile : field.getAnnotationsByType(com.team2813.lib.sparkMax.options.PIDProfile.class)) {
-//				System.out.println("\tConfiguring pid profile " + profile.profile());
-//				spark.setPIDF(profile.profile().id, profile.p(), profile.i(), profile.d(), profile.f());
-//			}
+
+			for (PIDControllerConfig pidController : options.getPidControllers()) {
+				spark.setPIDF(options.getPidControllers().indexOf(pidController), pidController.getP(), pidController.getI(),
+						  pidController.getD(), pidController.getF());
+			}
+
+
 
             Inverted inverted = options.getInverted();
             if (inverted != null)

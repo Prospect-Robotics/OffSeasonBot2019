@@ -1,9 +1,6 @@
 package com.team2813.lib.sparkMax;
 
-import com.revrobotics.CANError;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
+import com.revrobotics.*;
 import com.team2813.lib.sparkMax.options.InvertType;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
@@ -414,6 +411,22 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public void setParamCore(ConfigParameter parameterID, ParameterType type, int value) throws SparkMaxException {
 		throwIfNotOk(setParameterCore(parameterID, type, value));
+	}
+
+	//#endregion
+
+	//#region Limit Switch
+
+	public boolean isForwardLimitSwitchClosed() {
+		return getLimitSwitchPolarity(true, CANDigitalInput.LimitSwitchPolarity.kNormallyClosed);
+	}
+
+	public boolean isReverseLimitSwitchClosed() {
+		return getLimitSwitchPolarity(false, CANDigitalInput.LimitSwitchPolarity.kNormallyClosed);
+	}
+
+	public boolean getLimitSwitchPolarity(boolean forward, CANDigitalInput.LimitSwitchPolarity normal) {
+		return forward ? getForwardLimitSwitch(normal).get() : getReverseLimitSwitch(normal).get();
 	}
 
 	//#endregion
