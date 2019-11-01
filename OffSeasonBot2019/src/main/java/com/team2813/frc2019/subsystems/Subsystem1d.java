@@ -72,6 +72,10 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 		double positionTicks;
 	}
 
+	/*==========================
+	* POSITION
+	* ==========================*/
+
 	protected interface Position<E> {
 		/** int encoder ticks */
 		int getPos();
@@ -87,5 +91,13 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 		default E getClock(boolean clockwise) {
 			return clockwise ? getNextClockwise() : getNextCounter();
 		}
+	}
+
+	private synchronized void setPosition(int encoderPosition) {
+		periodicIO.demand = encoderPosition;
+	}
+
+	public synchronized void setPosition(P position) {
+		setPosition(position.getPos());
 	}
 }
