@@ -25,6 +25,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -32,6 +34,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -61,6 +65,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -68,6 +74,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -92,6 +100,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -99,6 +109,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -123,6 +135,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -130,6 +144,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -154,6 +170,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -161,6 +179,8 @@ motors:
         i: 0
         d: 0
         f: 0
+        maxVelocity: 0
+        maxAcceleration: 0
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0

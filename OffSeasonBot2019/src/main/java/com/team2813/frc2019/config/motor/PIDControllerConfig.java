@@ -5,6 +5,9 @@ public class PIDControllerConfig {
     private double i;
     private double d;
     private double f;
+    private double maxVelocity;
+    private double maxAcceleration;
+    private double minVelocity = 0; // default
     private double maxIntegralAccumulator;
     private double integralZone;
     private double allowableClosedLoopError;
@@ -39,6 +42,30 @@ public class PIDControllerConfig {
 
     public void setF(double f) {
         this.f = f;
+    }
+
+    public double getMaxVelocity() {
+        return maxVelocity;
+    }
+
+    public void setMaxVelocity(double maxVelocity) {
+        this.maxVelocity = maxVelocity;
+    }
+
+    public double getMaxAcceleration() {
+        return maxAcceleration;
+    }
+
+    public void setMaxAcceleration(double maxAcceleration) {
+        this.maxAcceleration = maxAcceleration;
+    }
+
+    public double getMinVelocity() {
+        return minVelocity;
+    }
+
+    public void setMinVelocity(double minVelocity) {
+        this.minVelocity = minVelocity;
     }
 
     public double getMaxIntegralAccumulator() {

@@ -129,7 +129,6 @@ class SubsystemMotorConfig {
 //					spark.setSmartMotionMaxVelocity(options.motionCruiseVelocity()); // FIXME: 09/20/2019 need to change parameters/types
 //					spark.setSmartMotionMaxAccel(options.motionAcceleration()); // FIXME: 09/20/2019 need to change parameters/types
 
-
             spark.setSecondaryCurrLimit(options.getContinuousCurrentLimitAmps());// TODO check this is actually continuous limit
 
 //			for (com.team2813.lib.sparkMax.options.HardLimitSwitch hardLimitSwitch : field.getAnnotationsByType(com.team2813.lib.sparkMax.options.HardLimitSwitch.class)) {
@@ -145,8 +144,12 @@ class SubsystemMotorConfig {
 
 
 			for (PIDControllerConfig pidController : options.getPidControllers()) {
-				spark.setPIDF(options.getPidControllers().indexOf(pidController), pidController.getP(), pidController.getI(),
+			    int slotID = options.getPidControllers().indexOf(pidController);
+			    spark.setPIDF(slotID, pidController.getP(), pidController.getI(),
 						  pidController.getD(), pidController.getF());
+                spark.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
+                spark.getPIDController().setSmartMotionMaxAccel(pidController.getMaxAcceleration(), slotID);
+                spark.getPIDController().setSmartMotionMinOutputVelocity(pidController.getMinVelocity(), slotID);
 			}
 
 

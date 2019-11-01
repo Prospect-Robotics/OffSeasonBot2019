@@ -9,112 +9,69 @@ import edu.wpi.first.wpilibj.Timer;
 
 import static com.team2813.lib.logging.LogLevel.DEBUG;
 
-abstract class Subsystem1d<P extends Subsystem1d.Position<P>> extends Subsystem {
+abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 
-	public CANSparkMaxWrapper motor;
-
-	PeriodicIO periodicIO = new PeriodicIO();
-
-	private boolean hasBeenZeroed = false;
-
-	private ZeroingMode zeroingMode;
+	private CANSparkMaxWrapper motor;
+	public static PeriodicIO periodicIO = new PeriodicIO();
+	private boolean zeroed = false;
 
 	Subsystem1d(CANSparkMaxWrapper motor) {
 		try {
 			this.motor = motor;
-			motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10);
-			// TODO check if we need something for the Smart Motion
+			motor.setPeriodicFrame(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10);
 			motor.set(0, ControlType.kDutyCycle);
 			motor.setNeutralMode(CANSparkMax.IdleMode.kBrake);
 		} catch (SparkMaxException e) {
 			new SparkMaxException("Subsystem construction failed", e).printStackTrace();
-			constructorFailed();
+			e.printStackTrace();
 		}
 	}
 
-	private synchronized void setPosition(int encoderPosition) {
-		periodicIO.demand = encoderPosition;
-	}
-
-
-	public synchronized void writePeriodicOutputs_() {
+	@Override
+	protected void writePeriodicOutputs_() {
 		try {
-			double demand = periodicIO.demand;
-			motor.set(demand, ControlType.kSmartMotion);
-		} catch (SparkMaxException e) {
-			e.printStackTrace();
-		} try {
 			resetIfAtLimit();
-		} catch (SparkMaxException e) {
-			e.printStackTrace();
+			motor.set(periodicIO.demand, ControlType.kSmartMotion);
+		} catch(SparkMaxException e) {
+			new SparkMaxException("Subsystem initialization failed", e).printStackTrace();
 		}
 	}
 
-	// TODO 2813 Rewrite more logically
 	@Override
 	public synchronized void readPeriodicInputs_() {
 		final double t = Timer.getFPGATimestamp();
-		periodicIO.position_ticks = motor.getEncoderPosition();
-//			periodicIO.velocity_ticks_per_100ms = motor.gete getSelectedSensorVelocity(PidIdx.PRIMARY_CLOSED_LOOP);
-//			if (motor.getControl() == ControlMode.MotionMagic) {
-//				mPeriodicIO.active_trajectory_position = master.getActiveTrajectoryPosition();
-//				// TODO check sign of elevator accel
-//				mPeriodicIO.active_trajectory_velocity = master.getActiveTrajectoryVelocity();
-//			} else {
-//				mPeriodicIO.active_trajectory_position = Integer.MIN_VALUE;
-//				mPeriodicIO.active_trajectory_velocity = 0;
-//			}
-		periodicIO.output_percent = motor.getAppliedOutput(); // TODO check this is what I think it is
-
-		if (zeroingMode.forward)
-			periodicIO.limit_switch = motor.isForwardLimitSwitchClosed();
-		if (zeroingMode.reverse)
-			periodicIO.limit_switch = motor.isReverseLimitSwitchClosed();
-		periodicIO.t = t;
+		periodicIO.positionTicks = motor.getEncoderPosition();
 	}
 
 	public synchronized void resetIfAtLimit() throws SparkMaxException {
-		if (periodicIO.limit_switch) {
+		if (periodicIO.limitSwitch) {
 			zeroSensors_();
 		}
 	}
 
 	@Override
 	public synchronized void zeroSensors_() {
-
 		try {
 			motor.setEncoderPosition(0);
 			DEBUG.log(motor.subsystemName, "zeroed 1", motor.getEncoderPosition());
 		} catch (SparkMaxException e) {
 			e.printStackTrace();
 		}
-		hasBeenZeroed = true;
+		zeroed = true;
 	}
 
-	public static class PeriodicIO {
+	public boolean isZeroed() {
+		return zeroed;
+	}
 
-		// INPUTS
-		double position_ticks;
-
-		int velocity_ticks_per_100ms;
-
-		double active_trajectory_accel_g;
-
-		int active_trajectory_velocity;
-
-		int active_trajectory_position;
-
-		double output_percent;
-
-		boolean limit_switch;
-
-		public double t;
-
-		// OUTPUTS
+	static class PeriodicIO {
 		double demand;
+
+		boolean limitSwitch;
+
+		double positionTicks;
 	}
 
-	// TODO document
 	protected interface Position<E> {
 		/** int encoder ticks */
 		int getPos();
@@ -131,20 +88,4 @@ abstract class Subsystem1d<P extends Subsystem1d.Position<P>> extends Subsystem 
 			return clockwise ? getNextClockwise() : getNextCounter();
 		}
 	}
-
-	public enum ZeroingMode {
-		FORWARD(true, false),
-		REVERSE(false, true),
-		BOTH(true, true),
-		NEITHER(false, false);
-
-		final boolean forward, reverse;
-
-		ZeroingMode(boolean forward, boolean reverse) {
-			this.forward = forward;
-			this.reverse = reverse;
-		}
-	}
-
-
 }
