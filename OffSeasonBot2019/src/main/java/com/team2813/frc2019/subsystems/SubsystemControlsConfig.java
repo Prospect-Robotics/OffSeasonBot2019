@@ -1,9 +1,26 @@
 package com.team2813.frc2019.subsystems;
 
-import edu.wpi.first.wpilibj.Joystick;
+import com.team2813.lib.controls.*;
 
 class SubsystemControlsConfig {
 
-	static Joystick driveJoystick = new Joystick(0);
+	private static Controller driveJoystick = new Controller(0);
+	static Button pivotButton = driveJoystick.button(1);
+	static Button autoButton = driveJoystick.button(2); // TODO: 10/05/2019 replace with correct button id
+	static Axis driveX = driveJoystick.axis(0);
+	static Axis driveY = driveJoystick.axis(3);
+	static Axis driveSteer = driveJoystick.axis(0);
+	static Axis driveForward = driveJoystick.axis(3);
+	static Axis driveReverse = driveJoystick.axis(2);
+
+	private static Controller controlsJoystick = new Controller(1);
+	static Button groundIntakeTogglePosition = controlsJoystick.button(1); // TODO: 11/01/2019 replace with correct button id
+	static Button groundIntakeRollerIn = controlsJoystick.button(2); // TODO: 11/01/2019 replace with correct button id
+	static Button groundIntakeRollerOut = controlsJoystick.button(3); // TODO: 11/01/2019 replace with correct button id
+	static Button mainIntakeClock = controlsJoystick.button(4); // TODO: 11/01/2019 replace with correct button id
+	static Button mainIntakeCounter = controlsJoystick.button(5); // TODO: 11/01/2019 replace with correct button id
+	static Button mainIntakeWheelIn = controlsJoystick.button(6); // TODO: 11/01/2019 replace with correct button id
+	static Button mainIntakeWheelOut = controlsJoystick.button(7); // TODO: 11/01/2019 replace with correct button id
+	static Button mainIntakeToggleMode = controlsJoystick.button(8); // TODO: 11/02/2019 replace with correct button id
 
 }

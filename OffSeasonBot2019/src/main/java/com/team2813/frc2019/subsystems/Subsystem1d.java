@@ -12,7 +12,7 @@ import static com.team2813.lib.logging.LogLevel.DEBUG;
 abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 
 	private CANSparkMaxWrapper motor;
-	public static PeriodicIO periodicIO = new PeriodicIO();
+	private static PeriodicIO periodicIO = new PeriodicIO();
 	private boolean zeroed = false;
 
 	Subsystem1d(CANSparkMaxWrapper motor) {
@@ -97,7 +97,11 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 		periodicIO.demand = encoderPosition;
 	}
 
-	public synchronized void setPosition(P position) {
+	synchronized void setPosition(P position) {
 		setPosition(position.getPos());
 	}
+
+	abstract void setNextPosition(boolean clockwise);
+
+	abstract void setNextPosition(P position);
 }

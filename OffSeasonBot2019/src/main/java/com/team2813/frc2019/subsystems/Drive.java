@@ -2,11 +2,20 @@ package com.team2813.frc2019.subsystems;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
+import com.team2813.lib.controls.Axis;
+import com.team2813.lib.controls.Button;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
-import edu.wpi.first.wpilibj.Joystick;
 
+/**
+ * The Drive subsystem is the main subsystem for
+ * the drive train, and handles both driver control
+ * and autonomous path control.
+ *
+ * @author Grady Whelan
+ * @author Samuel Li
+ */
 public class Drive extends Subsystem {
 
 	// Physical Constants
@@ -27,13 +36,14 @@ public class Drive extends Subsystem {
 
 	// Controls
 	private static final double TELEOP_DEAD_ZONE = 0.01;
-	private static final Joystick JOYSTICK = SubsystemControlsConfig.driveJoystick;
-	private static final int X_AXIS = 0; // steer
-	private static final int Y_AXIS_POS = 3; // arcade drive y axis; curvature drive forward
-	private static final int Y_AXIS_NEG = 2; // curvature drive reverse
-	private static final int PIVOT_BUTTON_ID = 1;
+	private static final Axis ARCADE_X_AXIS = SubsystemControlsConfig.driveX;
+	private static final Axis ARCADE_Y_AXIS = SubsystemControlsConfig.driveY;
+	private static final Axis CURVATURE_STEER = SubsystemControlsConfig.driveSteer;
+	private static final Axis CURVATURE_FORWARD = SubsystemControlsConfig.driveForward;
+	private static final Axis CURVATURE_REVERSE = SubsystemControlsConfig.driveReverse;
+	private static final Button PIVOT_BUTTON = SubsystemControlsConfig.pivotButton;
 	private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
-	private static final int AUTO_BUTTON_ID = 2; // TODO: 10/05/2019 replace with correct button id
+	private static final Button AUTO_BUTTON = SubsystemControlsConfig.autoButton;
 
 	// Mode
 	private static DriveMode driveMode = DriveMode.OPEN_LOOP;
@@ -54,9 +64,9 @@ public class Drive extends Subsystem {
 	private void teleopDrive(TeleopDriveType driveType) {
 
 		if (driveType == TeleopDriveType.ARCADE) {
-			arcadeDrive(JOYSTICK.getRawAxis(Y_AXIS_POS), JOYSTICK.getRawAxis(X_AXIS));
+			arcadeDrive(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
 		} else if (driveType == TeleopDriveType.CURVATURE) {
-			curvatureDrive(JOYSTICK.getRawAxis(Y_AXIS_POS), JOYSTICK.getRawAxis(Y_AXIS_NEG), JOYSTICK.getRawAxis(X_AXIS), JOYSTICK.getRawButton(PIVOT_BUTTON_ID));
+			curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());
 		}
 	}
 
@@ -117,10 +127,10 @@ public class Drive extends Subsystem {
 			teleopDrive(TELEOP_DRIVE_TYPE);
 		} else {
 			driveMode = DriveMode.SMART_MOTION;
-			if (JOYSTICK.getRawButtonPressed(AUTO_BUTTON_ID))
-				while (Math.abs(limelightDegrees) > ALLOWABLE_LIMELIGHT_ERROR) {
+			AUTO_BUTTON.whenPressed(() -> {
+				while (Math.abs(limelightDegrees) > ALLOWABLE_LIMELIGHT_ERROR)
 					autoDrive(limelightDegrees);
-				}
+			});
 		}
 	}
 

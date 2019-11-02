@@ -5,6 +5,7 @@ import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
 
 /**
+ * TODO rewrite this documentation block
  * The Subsystem abstract class, which serves as a basic framework for all robot subsystems. Each subsystem outputs
  * commands to SmartDashboard, has a stop routine (for after each match), and a routine to zero all sensors, which helps
  * with calibration.

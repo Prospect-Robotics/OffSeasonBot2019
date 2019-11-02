@@ -13,6 +13,8 @@ public class Subsystems {
 	public static final List<Subsystem> allSubsystems;
 
 	public static final Drive DRIVE;
+	public static final GroundIntake GROUND_INTAKE;
+	public static final MainIntake MAIN_INTAKE;
 	public static final Looper LOOPER = new Looper(RobotMode.DISABLED); //FIXME put looper somewhere else
 
 	private static class SmartDashboardLoop implements Loop{
@@ -29,8 +31,10 @@ public class Subsystems {
 
 	static {
 		DRIVE = new Drive();
+		GROUND_INTAKE = new GroundIntake();
+		MAIN_INTAKE = new MainIntake();
 		allSubsystems = Collections.unmodifiableList(Arrays.asList(
-				DRIVE
+				DRIVE, GROUND_INTAKE, MAIN_INTAKE
 		));
 		LOOPER.addLoop(new SmartDashboardLoop());
 	}

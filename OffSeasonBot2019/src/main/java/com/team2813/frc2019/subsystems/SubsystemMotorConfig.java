@@ -10,6 +10,7 @@ import com.team2813.lib.logging.LogLevel;
 import com.team2813.lib.logging.Logger;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
+import com.team2813.lib.talon.VictorWrapper;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import java.io.File;
@@ -74,9 +75,11 @@ class SubsystemMotorConfig {
     static CANSparkMaxWrapper mainIntakeWrist;
     static CANSparkMaxWrapper mainIntakeWheel;
     static CANSparkMaxWrapper groundIntakeArm;
+    static VictorWrapper groundIntakeRoller;
 
 
     static List<Integer> sparkIds = new ArrayList<>();
+    static List<Integer> victorIds = new ArrayList<>();
 
     static {
         try {
@@ -91,12 +94,15 @@ class SubsystemMotorConfig {
             mainIntakeWrist = initializeSpark("mainIntakeWrist");
             mainIntakeWheel = initializeSpark("mainIntakeWheel");
             groundIntakeArm = initializeSpark("groundIntakeArm");
+            groundIntakeRoller = initializeVictor("groundIntakeRoller");
 
         } catch (IOException e) {
             Logger.log(LogLevel.ERROR, "Unable to read config");
             e.printStackTrace();
         }
     }
+
+    //#region SPARK MAX Initialization
 
     private static CANSparkMaxWrapper initializeSpark(String name) {
         MotorConfig options = motorConfigs.get(name);
@@ -175,6 +181,20 @@ class SubsystemMotorConfig {
     }
 
     //#endregion
+
+    //#region VICTOR SPX Initialization
+    private static VictorWrapper initializeVictor(String name) {
+        MotorConfig options = motorConfigs.get(name);
+        System.out.println("Configuring " + options.getSubsystemName());
+
+        for (Integer id : victorIds)
+            if (id == options.getDeviceNumber()) {
+                System.err.println("Tried to register VICTOR SPX with already used id");
+            }
+
+        victorIds.add(options.getDeviceNumber());
+        return new VictorWrapper(options.getDeviceNumber(), options.getSubsystemName());
+    }
 
     //#region Talon Initialization
 //	static {
