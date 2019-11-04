@@ -64,7 +64,7 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 		return zeroed;
 	}
 
-	static class PeriodicIO {
+	static class PeriodicIO { // FIXME: 11/02/2019 this probably shouldn't be static
 		double demand;
 
 		boolean limitSwitch;

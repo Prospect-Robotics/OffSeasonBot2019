@@ -91,10 +91,10 @@ class SubsystemMotorConfig {
 
             driveLeft = initializeSpark("driveLeft");
             driveRight = initializeSpark("driveRight");
-            mainIntakeWrist = initializeSpark("mainIntakeWrist");
-            mainIntakeWheel = initializeSpark("mainIntakeWheel");
-            groundIntakeArm = initializeSpark("groundIntakeArm");
-            groundIntakeRoller = initializeVictor("groundIntakeRoller");
+//            mainIntakeWrist = initializeSpark("mainIntakeWrist");
+//            mainIntakeWheel = initializeSpark("mainIntakeWheel");
+//            groundIntakeArm = initializeSpark("groundIntakeArm");
+//            groundIntakeRoller = initializeVictor("groundIntakeRoller");
 
         } catch (IOException e) {
             Logger.log(LogLevel.ERROR, "Unable to read config");

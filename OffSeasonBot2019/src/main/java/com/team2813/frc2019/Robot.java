@@ -9,8 +9,10 @@ package com.team2813.frc2019;
 
 import com.team2813.frc2019.loops.Loop;
 import com.team2813.frc2019.subsystems.Drive;
+import com.team2813.frc2019.subsystems.MainIntake;
 import com.team2813.frc2019.subsystems.Subsystem;
 import com.team2813.lib.util.CrashTracker;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -85,6 +87,13 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		try {
 			CrashTracker.logAutoInit();
+			Compressor compressor = new Compressor(); // FIXME: 11/02/2019 this shouldn't need to be here
+			compressor.start();
+			MAIN_INTAKE.setMode(MainIntake.GamePiece.HATCH_PANEL);
+			for (Subsystem subsystem : allSubsystems) {
+				subsystem.zeroSensors();
+			}
+			teleopInit();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -112,6 +121,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		teleopPeriodic();
 	}
 
 	/**

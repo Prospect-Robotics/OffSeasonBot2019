@@ -5,19 +5,22 @@ import com.team2813.frc2019.actions.FunctionAction;
 import com.team2813.frc2019.actions.SeriesAction;
 import com.team2813.frc2019.actions.WaitAction;
 import com.team2813.lib.controls.Button;
+import com.team2813.lib.solenoid.PistonSolenoid;
+import com.team2813.lib.solenoid.PistonSolenoid.PistonState;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
-import com.team2813.lib.solenoid.PistonSolenoid;
-import com.team2813.lib.solenoid.PistonSolenoid.PistonState;
 
 import static com.team2813.frc2019.subsystems.Subsystems.LOOPER;
+import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.EXTENDED;
+import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.RETRACTED;
 
 public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	private static Position currentPosition = Position.HOME;
 
-	private static PistonSolenoid solenoid = new PistonSolenoid(0);
+	private static PistonSolenoid solenoidDefaultOn = new PistonSolenoid(0);
+	private static PistonSolenoid solenoidDefaultOff = new PistonSolenoid(1);
 
 	private static GamePiece mode = GamePiece.HATCH_PANEL;
 
@@ -100,9 +103,10 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		setMode(mode.getOpposite());
 	}
 
-	private void setMode(GamePiece gamePiece) {
+	public void setMode(GamePiece gamePiece) {
 		mode = gamePiece;
-		solenoid.set(mode.state);
+		solenoidDefaultOn.set(mode.state == EXTENDED ? RETRACTED : EXTENDED);
+		solenoidDefaultOff.set(mode.state);
 	}
 	enum Position implements Subsystem1d.Position<MainIntake.Position> {
 		REAR (-1000) { // TODO: 11/01/2019 find correct value
@@ -169,13 +173,13 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		}
 	}
 
-	enum GamePiece {
-		HATCH_PANEL(PistonState.RETRACTED) {
+	public enum GamePiece {
+		HATCH_PANEL(RETRACTED) {
 			@Override
 			GamePiece getOpposite() {
 				return GamePiece.CARGO;
 			}
-		}, CARGO(PistonState.EXTENDED) {
+		}, CARGO(EXTENDED) {
 			@Override
 			GamePiece getOpposite() {
 				return GamePiece.HATCH_PANEL;
