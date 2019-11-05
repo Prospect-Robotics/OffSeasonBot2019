@@ -10,6 +10,7 @@ import com.team2813.lib.solenoid.PistonSolenoid.PistonState;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static com.team2813.frc2019.subsystems.Subsystems.LOOPER;
 import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.EXTENDED;
@@ -43,7 +44,8 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	@Override
 	protected void outputTelemetry_() throws CTREException, SparkMaxException {
-
+		SmartDashboard.putNumber("MainIntake Demand", periodicIO.demand);
+		SmartDashboard.putNumber("MainIntake Position", periodicIO.positionTicks);
 	}
 
 	@Override
@@ -109,7 +111,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		solenoidDefaultOff.set(mode.state);
 	}
 	enum Position implements Subsystem1d.Position<MainIntake.Position> {
-		REAR (-1000) { // TODO: 11/01/2019 find correct value
+		REAR (-1) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return HOME;
@@ -129,7 +131,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 			public Position getNextCounter() {
 				return REAR;
 			}
-		}, FRONT(1000) { // TODO: 11/01/2019 find correct value
+		}, FRONT(1) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return REAR;
@@ -148,7 +150,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		}
 
 		@Override
-		public int getPos() {
+		public double getPos() {
 			return position;
 		}
 

@@ -42,6 +42,9 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		try {
 			CrashTracker.logRobotInit();
+			for (Subsystem subsystem : allSubsystems) {
+				subsystem.zeroSensors();
+			}
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;

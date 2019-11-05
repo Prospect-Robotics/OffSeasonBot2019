@@ -90,7 +90,7 @@ class SubsystemMotorConfig {
 
             File victorConfigFile = new File(deployDirectory.getAbsolutePath() + "/victorConfig.yaml");
 
-            victorConfigs = mapper.readValue(configFile, VictorConfigs.class).getMotors();
+            victorConfigs = mapper.readValue(victorConfigFile, VictorConfigs.class).getMotors();
 
             driveLeft = initializeSpark("driveLeft");
             driveRight = initializeSpark("driveRight");
@@ -188,7 +188,6 @@ class SubsystemMotorConfig {
     //#region VICTOR SPX Initialization
     private static VictorWrapper initializeVictor(String name) {
         VictorMotorConfig options = victorConfigs.get(name);
-        System.out.println("Configuring " + options.getSubsystemName());
 
         for (Integer id : victorIds)
             if (id == options.getDeviceNumber()) {

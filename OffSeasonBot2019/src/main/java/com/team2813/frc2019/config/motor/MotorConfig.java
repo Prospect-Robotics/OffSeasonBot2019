@@ -1,5 +1,6 @@
 package com.team2813.frc2019.config.motor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MotorConfig {
@@ -19,7 +20,7 @@ public class MotorConfig {
     private boolean invertSensorPhase;
     private PeriodicFrame statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
     private int statusFramePeriod = 5;
-    private List<FollowerConfig> followers;
+    private List<FollowerConfig> followers = new ArrayList<>();
     private Inverted inverted;
     private List<PIDControllerConfig> pidControllers;
 

@@ -1,7 +1,7 @@
 ---
 motors:
   groundIntakeRoller: # VICTOR SPX
-    deviceNumber: 8
+    deviceNumber: 11
     subsystemName: GroundIntake
 #    feedbackSensor: QUAD_RELATIVE
 #    reverseLimitSwitchEnable: false
