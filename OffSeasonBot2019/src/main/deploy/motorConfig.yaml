@@ -184,25 +184,4 @@ motors:
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
-  groundIntakeRoller: # VICTOR SPX
-    deviceNumber: 8
-    subsystemName: GroundIntake
-    feedbackSensor: QUAD_RELATIVE
-    reverseLimitSwitchEnable: false
-    reverseSoftLimit: 0
-    reverseSoftLimitEnable: false
-    enableVoltageCompensation: false
-    compSaturationVoltage: 12
-    motionAcceleration: 0
-    motionCruiseVelocity: 0
-    closedLoopRampRate: 0
-    openLoopRampRate: 0
-    invertSensorPhase: false
-    statusFrame: STATUS_2_FEEDBACK_0
-    statusFramePeriod: 5
-    clearOnLimitFwd: false
-    limitSwitchSource: FEEDBACK_CONNECTOR
-    limitSwitchNormal: NORMALLY_OPEN
-    velocityMeasPeriod: PERIOD_50Ms
-    velocityMeasWindow: SAMPLES_1
 ...

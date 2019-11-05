@@ -2,14 +2,12 @@ package com.team2813.frc2019.subsystems;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.team2813.frc2019.config.motor.FollowerConfig;
-import com.team2813.frc2019.config.motor.Inverted;
-import com.team2813.frc2019.config.motor.MotorConfig;
-import com.team2813.frc2019.config.motor.PIDControllerConfig;
+import com.team2813.frc2019.config.motor.*;
 import com.team2813.lib.logging.LogLevel;
 import com.team2813.lib.logging.Logger;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
+import com.team2813.lib.talon.BaseMotorControllerWrapper;
 import com.team2813.lib.talon.VictorWrapper;
 import edu.wpi.first.wpilibj.Filesystem;
 
@@ -69,6 +67,7 @@ class SubsystemMotorConfig {
     //#region Spark Max Initialization
 
     static Map<String, MotorConfig> motorConfigs;
+    static Map<String, VictorMotorConfig> victorConfigs;
 
     static CANSparkMaxWrapper driveLeft;
     static CANSparkMaxWrapper driveRight;
@@ -89,12 +88,16 @@ class SubsystemMotorConfig {
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             motorConfigs = mapper.readValue(configFile, MotorConfigs.class).getMotors();
 
+            File victorConfigFile = new File(deployDirectory.getAbsolutePath() + "/victorConfig.yaml");
+
+            victorConfigs = mapper.readValue(configFile, VictorConfigs.class).getMotors();
+
             driveLeft = initializeSpark("driveLeft");
             driveRight = initializeSpark("driveRight");
-//            mainIntakeWrist = initializeSpark("mainIntakeWrist");
-//            mainIntakeWheel = initializeSpark("mainIntakeWheel");
-//            groundIntakeArm = initializeSpark("groundIntakeArm");
-//            groundIntakeRoller = initializeVictor("groundIntakeRoller");
+            mainIntakeWrist = initializeSpark("mainIntakeWrist");
+            mainIntakeWheel = initializeSpark("mainIntakeWheel");
+            groundIntakeArm = initializeSpark("groundIntakeArm");
+            groundIntakeRoller = initializeVictor("groundIntakeRoller");
 
         } catch (IOException e) {
             Logger.log(LogLevel.ERROR, "Unable to read config");
@@ -184,7 +187,7 @@ class SubsystemMotorConfig {
 
     //#region VICTOR SPX Initialization
     private static VictorWrapper initializeVictor(String name) {
-        MotorConfig options = motorConfigs.get(name);
+        VictorMotorConfig options = victorConfigs.get(name);
         System.out.println("Configuring " + options.getSubsystemName());
 
         for (Integer id : victorIds)
@@ -193,6 +196,8 @@ class SubsystemMotorConfig {
             }
 
         victorIds.add(options.getDeviceNumber());
+        System.out.println("Configuring " + options.getSubsystemName());
+        // TODO IMPLEMENT OPTIONS
         return new VictorWrapper(options.getDeviceNumber(), options.getSubsystemName());
     }
 
@@ -385,6 +390,18 @@ class SubsystemMotorConfig {
         }
 
         public void setMotors(Map<String, MotorConfig> motors) {
+            this.motors = motors;
+        }
+    }
+
+    private static class VictorConfigs {
+        private Map<String, VictorMotorConfig> motors;
+
+        public Map<String, VictorMotorConfig> getMotors() {
+            return motors;
+        }
+
+        public void setMotors(Map<String, VictorMotorConfig> motors) {
             this.motors = motors;
         }
     }
