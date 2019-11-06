@@ -33,6 +33,8 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	private static final Button WHEEL_OUT = SubsystemControlsConfig.mainIntakeWheelOut;
 	private static final Button TOGGLE_MODE = SubsystemControlsConfig.mainIntakeToggleMode;
 
+	private static final double WHEEL_PERCENT = 0.7;
+
 	MainIntake() {
 		super(SubsystemMotorConfig.mainIntakeWrist);
 		setNextPosition(Position.HOME);
@@ -51,8 +53,10 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	@Override
 	protected void teleopControls_() throws CTREException, SparkMaxException {
-		WHEEL_OUT.whenPressed(() -> runWheelOut(true));
-		WHEEL_IN.whenPressed(() -> runWheelOut(false));
+		WHEEL_OUT.whenPressed(() -> startWheelOut(true));
+		WHEEL_IN.whenPressed(() -> startWheelOut(false));
+		WHEEL_OUT.whenReleased(this::stopWheel);
+		WHEEL_IN.whenReleased(this::stopWheel);
 		TOGGLE_MODE.whenPressed(this::toggleMode);
 		INTAKE_CLOCK.whenPressed(() -> setNextPosition(true));
 		INTAKE_CLOCK.whenPressed(() -> System.out.println("Main intake button Setting test"));
@@ -84,7 +88,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	}
 
 	private void startWheelOut(boolean out) {
-		wheelMotor.set(out ? 0.5 : -0.5);
+		wheelMotor.set(out ? WHEEL_PERCENT : -WHEEL_PERCENT);
 	}
 
 	private void stopWheel() {
@@ -113,35 +117,55 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		solenoidDefaultOff.set(mode.state);
 	}
 	enum Position implements Subsystem1d.Position<MainIntake.Position> {
-		REAR (-10) { // TODO: 11/01/2019 find correct value
+		REAR_HATCH (-13.8) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
-				return HOME;
+				return REAR_CARGO;
 			}
 			@Override
 			public Position getNextCounter() {
-				return FRONT;
+				return FRONT_HATCH;
+			}
+		},
+		REAR_CARGO(-8.3) {
+			@Override
+			public Position getNextClockwise() {
+				return REAR_HATCH;
+			}
+			@Override
+			public Position getNextCounter() {
+				return HOME;
 			}
 		},
 		HOME(0.0) {
 			@Override
 			public Position getNextClockwise() {
-				return FRONT;
+				return FRONT_CARGO;
 			}
 
 			@Override
 			public Position getNextCounter() {
-				return REAR;
+				return REAR_CARGO;
 			}
-		}, FRONT(10) { // TODO: 11/01/2019 find correct value
+		},
+		FRONT_CARGO(8.3) {
 			@Override
 			public Position getNextClockwise() {
-				return REAR;
+				return FRONT_HATCH;
+			}
+			public Position getNextCounter() {
+				return HOME;
+			}
+		},
+		FRONT_HATCH(13.8) { // TODO: 11/01/2019 find correct value
+			@Override
+			public Position getNextClockwise() {
+				return REAR_HATCH;
 			}
 
 			@Override
 			public Position getNextCounter() {
-				return HOME;
+				return FRONT_CARGO;
 			}
 		};
 
@@ -168,12 +192,12 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 		@Override
 		public Position getMin() {
-			return REAR;
+			return REAR_HATCH;
 		}
 
 		@Override
 		public Position getMax() {
-			return FRONT;
+			return FRONT_HATCH;
 		}
 	}
 

@@ -32,11 +32,19 @@ public class Button {
 		if (getPressed()) function.run();
 	}
 
+	public void whenReleased(Runnable function) {
+		if (getReleased()) function.run();
+	}
+
 	public boolean get()  {
 		return joystick.getRawButton(buttonNumber);
 	}
 
 	public boolean getPressed() {
 		return joystick.getRawButtonPressed(buttonNumber);
+	}
+
+	public boolean getReleased() {
+		return joystick.getRawButtonReleased(buttonNumber);
 	}
 }
