@@ -31,9 +31,9 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	@Override
 	protected void writePeriodicOutputs_() {
 		try {
-			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 1: " + periodicIO.demand);
+//			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 1: " + periodicIO.demand);
 			resetIfAtLimit();
-			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 2: " + periodicIO.demand);
+//			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 2: " + periodicIO.demand);
 //			System.out.println(motor.getPIDController())
 			motor.set(periodicIO.demand, ControlType.kSmartMotion);
 //			motor.set(.4, ControlType.kDutyCycle);
