@@ -35,6 +35,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	MainIntake() {
 		super(SubsystemMotorConfig.mainIntakeWrist);
+		setNextPosition(Position.HOME);
 	}
 
 	@Override
@@ -54,6 +55,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		WHEEL_IN.whenPressed(() -> runWheelOut(false));
 		TOGGLE_MODE.whenPressed(this::toggleMode);
 		INTAKE_CLOCK.whenPressed(() -> setNextPosition(true));
+		INTAKE_CLOCK.whenPressed(() -> System.out.println("Main intake button Setting test"));
 		INTAKE_COUNTER.whenPressed(() -> setNextPosition(false));
 	}
 
@@ -82,7 +84,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	}
 
 	private void startWheelOut(boolean out) {
-		wheelMotor.set(out ? 1.0 : -1.0);
+		wheelMotor.set(out ? 0.5 : -0.5);
 	}
 
 	private void stopWheel() {
@@ -111,7 +113,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		solenoidDefaultOff.set(mode.state);
 	}
 	enum Position implements Subsystem1d.Position<MainIntake.Position> {
-		REAR (-1) { // TODO: 11/01/2019 find correct value
+		REAR (-10) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return HOME;
@@ -121,7 +123,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return FRONT;
 			}
 		},
-		HOME(0) {
+		HOME(0.0) {
 			@Override
 			public Position getNextClockwise() {
 				return FRONT;
@@ -131,7 +133,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 			public Position getNextCounter() {
 				return REAR;
 			}
-		}, FRONT(1) { // TODO: 11/01/2019 find correct value
+		}, FRONT(10) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return REAR;
@@ -143,9 +145,9 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 			}
 		};
 
-		private final int position;
+		private final double position;
 
-		Position(int encoderPosition) {
+		Position(double encoderPosition) {
 			this.position = encoderPosition;
 		}
 

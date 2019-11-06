@@ -14,6 +14,7 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	private CANSparkMaxWrapper motor;
 	PeriodicIO periodicIO = new PeriodicIO();
 	private boolean zeroed = false;
+//	Mode mode = Mode.HOLDING;
 
 	Subsystem1d(CANSparkMaxWrapper motor) {
 		try {
@@ -30,8 +31,12 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	@Override
 	protected void writePeriodicOutputs_() {
 		try {
+			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 1: " + periodicIO.demand);
 			resetIfAtLimit();
+			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 2: " + periodicIO.demand);
+//			System.out.println(motor.getPIDController())
 			motor.set(periodicIO.demand, ControlType.kSmartMotion);
+//			motor.set(.4, ControlType.kDutyCycle);
 		} catch(SparkMaxException e) {
 			new SparkMaxException("Subsystem initialization failed", e).printStackTrace();
 		}
@@ -41,6 +46,7 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	public synchronized void readPeriodicInputs_() {
 		final double t = Timer.getFPGATimestamp();
 		periodicIO.positionTicks = motor.getEncoderPosition();
+//		if (periodicIO.positionTicks + 0.5
 	}
 
 	public synchronized void resetIfAtLimit() throws SparkMaxException {
@@ -53,6 +59,7 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	public synchronized void zeroSensors_() {
 		try {
 			motor.setEncoderPosition(0);
+//			mode = Mode.HOLDING;
 			DEBUG.log(motor.subsystemName, "zeroed 1", motor.getEncoderPosition());
 		} catch (SparkMaxException e) {
 			e.printStackTrace();
@@ -64,7 +71,17 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 		return zeroed;
 	}
 
-	static class PeriodicIO { // FIXME: 11/02/2019 this probably shouldn't be static
+//	enum Mode {
+//		HOLDING(0), MOVING(1);
+//
+//		int slot;
+//
+//		Mode(int slot) {
+//			this.slot = slot;
+//		}
+//	}
+
+	class PeriodicIO {
 		double demand;
 
 		boolean limitSwitch;
@@ -94,7 +111,9 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	}
 
 	private synchronized void setPosition(double encoderPosition) {
+		System.out.println(motor.subsystemName+"Setting Position to "+encoderPosition);
 		periodicIO.demand = encoderPosition;
+//		mode = Mode.MOVING;
 	}
 
 	synchronized void setPosition(P position) {
@@ -104,4 +123,8 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	abstract void setNextPosition(boolean clockwise);
 
 	abstract void setNextPosition(P position);
+
+	public CANSparkMaxWrapper getMotor() {
+		return motor;
+	}
 }

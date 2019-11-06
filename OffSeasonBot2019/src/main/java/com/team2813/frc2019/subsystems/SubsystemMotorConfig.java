@@ -159,6 +159,7 @@ class SubsystemMotorConfig {
                 spark.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
                 spark.getPIDController().setSmartMotionMaxAccel(pidController.getMaxAcceleration(), slotID);
                 spark.getPIDController().setSmartMotionMinOutputVelocity(pidController.getMinVelocity(), slotID);
+                spark.getPIDController().setSmartMotionAllowedClosedLoopError(pidController.getAllowableClosedLoopError(), slotID);
 			}
 
 
