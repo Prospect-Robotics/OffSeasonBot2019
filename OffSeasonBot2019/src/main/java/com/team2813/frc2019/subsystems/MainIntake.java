@@ -12,23 +12,27 @@ import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import static com.team2813.frc2019.subsystems.Subsystems.GROUND_INTAKE;
 import static com.team2813.frc2019.subsystems.Subsystems.LOOPER;
 import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.EXTENDED;
 import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.RETRACTED;
 
 public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
-	private static Position currentPosition = Position.HOME;
+	static Position currentPosition = Position.HOME;
 
 	private static PistonSolenoid solenoidDefaultOn = new PistonSolenoid(0);
 	private static PistonSolenoid solenoidDefaultOff = new PistonSolenoid(1);
 
-	private static GamePiece mode = GamePiece.HATCH_PANEL;
+	static GamePiece mode = GamePiece.HATCH_PANEL;
 
 	private static CANSparkMaxWrapper wheelMotor = SubsystemMotorConfig.mainIntakeWheel;
 
-	private static final Button INTAKE_CLOCK = SubsystemControlsConfig.mainIntakeClock;
-	private static final Button INTAKE_COUNTER = SubsystemControlsConfig.mainIntakeCounter;
+	private static final Button HOME = SubsystemControlsConfig.mainIntakeHome;
+	private static final Button PLACE_FORWARD = SubsystemControlsConfig.mainIntakePlacePieceForward;
+	private static final Button PLACE_REVERSE = SubsystemControlsConfig.mainIntakePlacePieceReverse;
+	private static final Button CARGO_PICKUP = SubsystemControlsConfig.mainIntakeCargoPickup;
+
 	private static final Button WHEEL_IN = SubsystemControlsConfig.mainIntakeWheelIn;
 	private static final Button WHEEL_OUT = SubsystemControlsConfig.mainIntakeWheelOut;
 	private static final Button TOGGLE_MODE = SubsystemControlsConfig.mainIntakeToggleMode;
@@ -49,6 +53,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	protected void outputTelemetry_() throws CTREException, SparkMaxException {
 		SmartDashboard.putNumber("MainIntake Demand", periodicIO.demand);
 		SmartDashboard.putNumber("MainIntake Position", periodicIO.positionTicks);
+		SmartDashboard.putBoolean("Mode", mode == GamePiece.HATCH_PANEL);
 	}
 
 	@Override
@@ -58,9 +63,15 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		WHEEL_OUT.whenReleased(this::stopWheel);
 		WHEEL_IN.whenReleased(this::stopWheel);
 		TOGGLE_MODE.whenPressed(this::toggleMode);
-		INTAKE_CLOCK.whenPressed(() -> setNextPosition(true));
-		INTAKE_CLOCK.whenPressed(() -> System.out.println("Main intake button Setting test"));
-		INTAKE_COUNTER.whenPressed(() -> setNextPosition(false));
+
+
+		HOME.whenPressed(() -> setNextPosition(Position.HOME));
+		PLACE_FORWARD.whenPressed(() -> setNextPosition(getPlacePosition(mode, true)));
+		PLACE_REVERSE.whenPressed(() -> setNextPosition(getPlacePosition(mode, false)));
+		if (mode == GamePiece.CARGO) CARGO_PICKUP.whenPressed(() -> setNextPosition(Position.PICKUP_CARGO));
+//		INTAKE_CLOCK.whenPressed(() -> setNextPosition(true));
+//		INTAKE_CLOCK.whenPressed(() -> System.out.println("Main intake button Setting test"));
+//		INTAKE_COUNTER.whenPressed(() -> setNextPosition(false));
 	}
 
 	@Override
@@ -78,21 +89,34 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	}
 
-	private void runWheelOut(boolean out) {
-		Action action = new SeriesAction(
-			new FunctionAction(() -> startWheelOut(out), true),
-			new WaitAction(1.0),// TODO: 11/01/2019 tune
-			new FunctionAction(this::stopWheel, true)
-		);
-		LOOPER.addAction(action);
-	}
-
 	private void startWheelOut(boolean out) {
-		wheelMotor.set(out ? WHEEL_PERCENT : -WHEEL_PERCENT);
+		double wheelPercent = out ? -WHEEL_PERCENT : WHEEL_PERCENT;
+		if (mode == GamePiece.CARGO) wheelPercent = -wheelPercent;
+		wheelMotor.set(wheelPercent);
+		try {
+			Subsystems.GROUND_INTAKE.setRollerOut(out);
+		} catch (CTREException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void stopWheel() {
 		wheelMotor.set(0.0);
+		try {
+			Subsystems.GROUND_INTAKE.stopRoller();
+		} catch (CTREException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Position getPlacePosition(GamePiece mode, boolean forward) {
+		if (mode == GamePiece.CARGO) {
+			if (forward) return Position.FRONT_CARGO;
+			else return Position.REAR_CARGO;
+		} else {
+			if (forward) return Position.FRONT_HATCH;
+			else return Position.REAR_HATCH;
+		}
 	}
 
 	@Override
@@ -108,6 +132,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	}
 
 	private void toggleMode() {
+		if (GROUND_INTAKE.targetPosition == GroundIntake.Position.EXTENDED && mode == GamePiece.CARGO) return;
 		setMode(mode.getOpposite());
 	}
 
@@ -124,17 +149,17 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 			}
 			@Override
 			public Position getNextCounter() {
-				return FRONT_HATCH;
+				return PICKUP_CARGO;
 			}
 		},
 		REAR_CARGO(-8.3) {
 			@Override
 			public Position getNextClockwise() {
-				return REAR_HATCH;
+				return HOME;
 			}
 			@Override
 			public Position getNextCounter() {
-				return HOME;
+				return REAR_HATCH;
 			}
 		},
 		HOME(0.0) {
@@ -160,12 +185,21 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		FRONT_HATCH(13.8) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
-				return REAR_HATCH;
+				return PICKUP_CARGO;
 			}
 
 			@Override
 			public Position getNextCounter() {
 				return FRONT_CARGO;
+			}
+		},
+		PICKUP_CARGO(18.8) {
+			@Override
+			public Position getNextClockwise() {
+				return REAR_HATCH;
+			}
+			public Position getNextCounter() {
+				return FRONT_HATCH;
 			}
 		};
 

@@ -12,21 +12,30 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class GroundIntake extends Subsystem {
 
-    private Position targetPosition = Position.RETRACTED;
+    Position targetPosition = Position.RETRACTED;
     private double encoderPosition;
-    private final double ALLOWABLE_ERROR = 0.15;
-    private final double PERCENT = 0.5;
+    private final double ALLOWABLE_ERROR = 0.3;
+    private final double SLOW_RANGE = 0.5;
+    private final double HIGH_PERCENT = 1.0;
+    private final double LOW_PERCENT = 0.4;
     private final CANSparkMaxWrapper MOTOR = SubsystemMotorConfig.groundIntakeArm;
 
-    private static final Button ROLLER_OUT = SubsystemControlsConfig.groundIntakeRollerOut;
-    private static final Button ROLLER_IN = SubsystemControlsConfig.groundIntakeRollerIn;
+//    private static final Button ROLLER_OUT = SubsystemControlsConfig.groundIntakeRollerOut;
+//    private static final Button ROLLER_IN = SubsystemControlsConfig.groundIntakeRollerIn;
     private static final Button TOGGLE_POSITION = SubsystemControlsConfig.groundIntakeTogglePosition;
 
     private static final VictorWrapper ROLLER = SubsystemMotorConfig.groundIntakeRoller;
 	private static final double ROLLER_SPEED = 0.7;
 
 	GroundIntake() {
-	    
+        try {
+            MOTOR.enableForwardSoftLimit(true);
+            MOTOR.setForwardSoftLimit(Position.LIMIT_OUT.getPos());
+            MOTOR.enableReverseSoftLimit(true);
+            MOTOR.setReverseSoftLimit(Position.LIMIT_IN.getPos());
+        } catch (SparkMaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -35,15 +44,26 @@ public class GroundIntake extends Subsystem {
     }
 
     @Override
+    protected void zeroSensors_() throws SparkMaxException {
+	    MOTOR.setEncoderPosition(0.0);
+    }
+
+    @Override
     protected void outputTelemetry_() {
-        SmartDashboard.putNumber("MainIntake Target", targetPosition.getPos());
-        SmartDashboard.putNumber("MainIntake Position", encoderPosition);
+        SmartDashboard.putNumber("GroundIntake Target", targetPosition.getPos());
+        SmartDashboard.putNumber("GroundIntake Position", encoderPosition);
     }
 
     @Override
     protected void writePeriodicOutputs_() throws SparkMaxException {
-        if (targetPosition.getPos() - encoderPosition > ALLOWABLE_ERROR) {
-            MOTOR.set(PERCENT, ControlType.kDutyCycle);
+	    if (targetPosition == Position.RETRACTED && MainIntake.currentPosition == MainIntake.Position.PICKUP_CARGO) {
+	        targetPosition = Position.EXTENDED;
+        }
+	    if (Math.abs(targetPosition.getPos() - encoderPosition) > ALLOWABLE_ERROR) {
+
+	        double percent = Math.abs(targetPosition.getPos() - encoderPosition) > SLOW_RANGE ? HIGH_PERCENT : LOW_PERCENT;
+            boolean forward = targetPosition.getPos() > encoderPosition;
+            MOTOR.set(forward ? percent : -percent, ControlType.kDutyCycle);
         } else {
             MOTOR.setNeutralMode(CANSparkMax.IdleMode.kBrake);
             MOTOR.set(0.0, ControlType.kDutyCycle);
@@ -56,25 +76,9 @@ public class GroundIntake extends Subsystem {
     }
 
     @Override
-    protected void teleopControls_() throws CTREException {
+    protected void teleopControls_() {
+	    if (Subsystems.MAIN_INTAKE.mode == MainIntake.GamePiece.HATCH_PANEL) return;
         TOGGLE_POSITION.whenPressed(this::togglePosition);
-        ROLLER_OUT.whenPressed(() -> {
-            try {
-                setRollerOut(true);
-            } catch (CTREException e) {
-                e.printStackTrace();
-            }
-        });
-        ROLLER_IN.whenPressed(() -> {
-            try {
-                setRollerOut(false);
-            } catch (CTREException e) {
-                e.printStackTrace();
-            }
-        });
-        if (!ROLLER_OUT.get() && !ROLLER_IN.get()) {
-			ROLLER.set(ControlMode.PercentOutput, 0);
-        }
     }
 
     @Override
@@ -96,13 +100,19 @@ public class GroundIntake extends Subsystem {
         targetPosition = targetPosition.getNextClockwise();
     }
 
-    private void setRollerOut(boolean out) throws CTREException {
+    void setRollerOut(boolean out) throws CTREException {
+	    if (targetPosition != Position.EXTENDED) return;
         double percent = out ? ROLLER_SPEED : -ROLLER_SPEED;
         ROLLER.set(ControlMode.PercentOutput, percent);
     }
 
+    void stopRoller() throws CTREException {
+	    ROLLER.set(ControlMode.PercentOutput, 0.0);
+    }
+
     enum Position implements Subsystem1d.Position<GroundIntake.Position> {
-        RETRACTED(0) {
+        LIMIT_IN(-0.1),
+	    RETRACTED(0.0) {
             @Override
             public Position getNextClockwise() {
                 return EXTENDED;
@@ -112,7 +122,7 @@ public class GroundIntake extends Subsystem {
             public Position getNextCounter() {
                 return EXTENDED;
             }
-        }, EXTENDED(2.5) { // TODO: 11/01/2019 find correct value
+        }, EXTENDED(2.2) { // TODO: 11/01/2019 find correct value
 
             @Override
             public Position getNextClockwise() {
@@ -123,7 +133,7 @@ public class GroundIntake extends Subsystem {
             public Position getNextCounter() {
                 return RETRACTED;
             }
-        }, LIMIT (3.0); // TODO: 11/05/2019 find correct value
+        }, LIMIT_OUT (2.6); // TODO: 11/05/2019 find correct value
 
         private final double position;
 

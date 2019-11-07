@@ -5,6 +5,7 @@ import com.team2813.lib.sparkMax.options.InvertType;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
+import edu.wpi.first.wpilibj.Spark;
 
 public class CANSparkMaxWrapper extends CANSparkMax {
 
@@ -38,10 +39,6 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 	//#region Error
 
 	protected void throwIfNotOk(CANError error) throws SparkMaxException {
-		SparkMaxException.throwIfNotOk(subsystemName, error);
-	}
-
-	protected void throwIfNotOk(ParameterStatus error) throws SparkMaxException {
 		SparkMaxException.throwIfNotOk(subsystemName, error);
 	}
 
@@ -395,26 +392,6 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#endregion
 
-	//#region Parameter Config
-
-	public void setParam(ConfigParameter parameterID, double value) throws SparkMaxException {
-		throwIfNotOk(setParameter(parameterID, value));
-	}
-
-	public void setParam(ConfigParameter parameterID, int value) throws SparkMaxException {
-		throwIfNotOk(setParameter(parameterID, value));
-	}
-
-	public void setParam(ConfigParameter parameterID, boolean value) throws SparkMaxException {
-		throwIfNotOk(setParameter(parameterID, value));
-	}
-
-	public void setParamCore(ConfigParameter parameterID, ParameterType type, int value) throws SparkMaxException {
-		throwIfNotOk(setParameterCore(parameterID, type, value));
-	}
-
-	//#endregion
-
 	//#region Limit Switch
 
 	public boolean isForwardLimitSwitchClosed() {
@@ -427,6 +404,34 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public boolean getLimitSwitchPolarity(boolean forward, CANDigitalInput.LimitSwitchPolarity normal) {
 		return forward ? getForwardLimitSwitch(normal).get() : getReverseLimitSwitch(normal).get();
+	}
+
+	//#endregion
+
+	//#region Soft Limit
+
+	public void enableForwardSoftLimit(boolean enable) throws SparkMaxException {
+		enableSoftLimit(true, enable);
+	}
+
+	public void enableReverseSoftLimit(boolean enable) throws SparkMaxException {
+		enableSoftLimit(false, enable);
+	}
+
+	public void enableSoftLimit(boolean forward, boolean enable) throws SparkMaxException {
+		throwIfNotOk(enableSoftLimit(forward ? SoftLimitDirection.kForward : SoftLimitDirection.kReverse, enable));
+	}
+
+	public void setSoftLimit(boolean forward, double position) throws SparkMaxException {
+		throwIfNotOk(setSoftLimit(forward ? SoftLimitDirection.kForward : SoftLimitDirection.kReverse, (float) position));
+	}
+
+	public void setForwardSoftLimit(double position) throws SparkMaxException {
+		setSoftLimit(true, position);
+	}
+
+	public void setReverseSoftLimit(double position) throws SparkMaxException {
+		setSoftLimit(false, position);
 	}
 
 	//#endregion
