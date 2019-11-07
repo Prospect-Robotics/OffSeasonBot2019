@@ -1,9 +1,5 @@
 package com.team2813.frc2019.subsystems;
 
-import com.team2813.frc2019.actions.Action;
-import com.team2813.frc2019.actions.FunctionAction;
-import com.team2813.frc2019.actions.SeriesAction;
-import com.team2813.frc2019.actions.WaitAction;
 import com.team2813.lib.controls.Button;
 import com.team2813.lib.solenoid.PistonSolenoid;
 import com.team2813.lib.solenoid.PistonSolenoid.PistonState;
@@ -13,7 +9,6 @@ import com.team2813.lib.talon.CTREException;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static com.team2813.frc2019.subsystems.Subsystems.GROUND_INTAKE;
-import static com.team2813.frc2019.subsystems.Subsystems.LOOPER;
 import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.EXTENDED;
 import static com.team2813.lib.solenoid.PistonSolenoid.PistonState.RETRACTED;
 
@@ -32,12 +27,13 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	private static final Button PLACE_FORWARD = SubsystemControlsConfig.mainIntakePlacePieceForward;
 	private static final Button PLACE_REVERSE = SubsystemControlsConfig.mainIntakePlacePieceReverse;
 	private static final Button CARGO_PICKUP = SubsystemControlsConfig.mainIntakeCargoPickup;
+	private static final Button CARGO_ROCKET_HOLD = SubsystemControlsConfig.mainIntakeCargoRocketHold;
 
 	private static final Button WHEEL_IN = SubsystemControlsConfig.mainIntakeWheelIn;
 	private static final Button WHEEL_OUT = SubsystemControlsConfig.mainIntakeWheelOut;
 	private static final Button TOGGLE_MODE = SubsystemControlsConfig.mainIntakeToggleMode;
 
-	private static final double WHEEL_PERCENT = 0.7;
+	private static final double WHEEL_PERCENT = 1.0;
 
 	MainIntake() {
 		super(SubsystemMotorConfig.mainIntakeWrist);
@@ -111,8 +107,13 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	private Position getPlacePosition(GamePiece mode, boolean forward) {
 		if (mode == GamePiece.CARGO) {
-			if (forward) return Position.FRONT_CARGO;
-			else return Position.REAR_CARGO;
+			if (forward) {
+				if (CARGO_ROCKET_HOLD.get()) return Position.FRONT_CARGO_ROCKET;
+				else return Position.FRONT_CARGO_SHIP;
+			} else {
+				if (CARGO_ROCKET_HOLD.get()) return Position.REAR_CARGO_ROCKET;
+				else return Position.REAR_CARGO_SHIP;
+			}
 		} else {
 			if (forward) return Position.FRONT_HATCH;
 			else return Position.REAR_HATCH;
@@ -145,14 +146,15 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		REAR_HATCH (-13.8) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
-				return REAR_CARGO;
+				return REAR_CARGO_SHIP;
 			}
 			@Override
 			public Position getNextCounter() {
 				return PICKUP_CARGO;
 			}
 		},
-		REAR_CARGO(-4.8) {
+		REAR_CARGO_ROCKET(-9.0),
+		REAR_CARGO_SHIP(-3.5) {
 			@Override
 			public Position getNextClockwise() {
 				return HOME;
@@ -165,15 +167,21 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		HOME(0.0) {
 			@Override
 			public Position getNextClockwise() {
-				return FRONT_CARGO;
+				return FRONT_CARGO_SHIP;
 			}
 
 			@Override
 			public Position getNextCounter() {
-				return REAR_CARGO;
+				return REAR_CARGO_SHIP;
 			}
 		},
-		FRONT_CARGO(8.3) {
+		FRONT_CARGO_SHIP(3.5) {
+			/*
+			 * 8.3 is too far forward for the cargo ship
+			 * 8.3 is too far back for the rocket
+			 * 4.8 is too far back for the cargo ship
+			 * 4.8 is too far back for the rocket
+			 */
 			@Override
 			public Position getNextClockwise() {
 				return FRONT_HATCH;
@@ -182,6 +190,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return HOME;
 			}
 		},
+		FRONT_CARGO_ROCKET(9.0),
 		FRONT_HATCH(13.8) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
@@ -190,7 +199,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 			@Override
 			public Position getNextCounter() {
-				return FRONT_CARGO;
+				return FRONT_CARGO_SHIP;
 			}
 		},
 		PICKUP_CARGO(18.8) {
