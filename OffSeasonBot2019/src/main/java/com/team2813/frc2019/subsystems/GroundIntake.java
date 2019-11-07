@@ -16,8 +16,8 @@ public class GroundIntake extends Subsystem {
     private double encoderPosition;
     private final double ALLOWABLE_ERROR = 0.3;
     private final double SLOW_RANGE = 0.5;
-    private final double HIGH_PERCENT = 1.0;
-    private final double LOW_PERCENT = 0.4;
+    private final double HIGH_PERCENT = 0.3;
+    private final double LOW_PERCENT = 0.1;
     private final CANSparkMaxWrapper MOTOR = SubsystemMotorConfig.groundIntakeArm;
 
 //    private static final Button ROLLER_OUT = SubsystemControlsConfig.groundIntakeRollerOut;

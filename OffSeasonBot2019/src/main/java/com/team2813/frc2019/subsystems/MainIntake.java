@@ -90,7 +90,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	}
 
 	private void startWheelOut(boolean out) {
-		double wheelPercent = out ? -WHEEL_PERCENT : WHEEL_PERCENT;
+		double wheelPercent = out ? WHEEL_PERCENT : -WHEEL_PERCENT;
 		if (mode == GamePiece.CARGO) wheelPercent = -wheelPercent;
 		wheelMotor.set(wheelPercent);
 		try {
@@ -152,7 +152,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return PICKUP_CARGO;
 			}
 		},
-		REAR_CARGO(-8.3) {
+		REAR_CARGO(-4.8) {
 			@Override
 			public Position getNextClockwise() {
 				return HOME;
