@@ -138,12 +138,14 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	}
 
 	public void setMode(GamePiece gamePiece) {
-		mode = gamePiece;
-		solenoidDefaultOn.set(mode.state == EXTENDED ? RETRACTED : EXTENDED);
-		solenoidDefaultOff.set(mode.state);
+		if (periodicIO.demand != Position.FRONT_HATCH.getPos() && periodicIO.demand != Position.REAR_HATCH.getPos()) {
+			mode = gamePiece;
+			solenoidDefaultOn.set(mode.state == EXTENDED ? RETRACTED : EXTENDED);
+			solenoidDefaultOff.set(mode.state);
+		}
 	}
 	enum Position implements Subsystem1d.Position<MainIntake.Position> {
-		REAR_HATCH (-13.8) { // TODO: 11/01/2019 find correct value
+		REAR_HATCH (-14.0) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return REAR_CARGO_SHIP;
@@ -202,7 +204,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return FRONT_CARGO_SHIP;
 			}
 		},
-		PICKUP_CARGO(18.8) {
+		PICKUP_CARGO(17.6) {
 			@Override
 			public Position getNextClockwise() {
 				return REAR_HATCH;

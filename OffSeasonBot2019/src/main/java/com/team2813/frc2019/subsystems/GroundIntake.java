@@ -25,7 +25,7 @@ public class GroundIntake extends Subsystem {
     private static final Button TOGGLE_POSITION = SubsystemControlsConfig.groundIntakeTogglePosition;
 
     private static final VictorWrapper ROLLER = SubsystemMotorConfig.groundIntakeRoller;
-	private static final double ROLLER_SPEED = 0.7;
+	private static final double ROLLER_SPEED = .8;
 
 	GroundIntake() {
         try {
