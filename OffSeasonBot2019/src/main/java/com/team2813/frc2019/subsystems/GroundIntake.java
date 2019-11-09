@@ -133,7 +133,7 @@ public class GroundIntake extends Subsystem {
             public Position getNextCounter() {
                 return RETRACTED;
             }
-        }, LIMIT_OUT (2.6); // TODO: 11/05/2019 find correct value
+        }, LIMIT_OUT (2.4); // TODO: 11/05/2019 find correct value
 
         private final double position;
 

@@ -19,7 +19,7 @@ motors:
       - id: 4
         type: BRUSHLESS
         inverted: FOLLOW_LEADER
-    inverted: INVERTED
+    inverted: NONINVERTED
     pidControllers:
       - p: 0
         i: 0
@@ -59,7 +59,7 @@ motors:
       - id: 2
         type: BRUSHLESS
         inverted: FOLLOW_LEADER
-    inverted: NONINVERTED
+    inverted: INVERTED
     pidControllers:
       - p: 0
         i: 0

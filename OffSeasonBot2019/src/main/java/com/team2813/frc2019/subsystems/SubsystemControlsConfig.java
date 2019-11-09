@@ -40,5 +40,5 @@ class SubsystemControlsConfig {
 	static Button mainIntakePlacePieceReverse = controlsJoystick.button(1);
 	static Button mainIntakeCargoPickup = controlsJoystick.button(2);
 
-
+	static Axis mainIntakeArmFineControl = controlsJoystick.axis(3);
 }

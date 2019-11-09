@@ -74,6 +74,8 @@ public class Drive extends Subsystem {
 		double throttle = Math.pow(throttleForward, 2) - Math.pow(throttleBackward, 2);
 //        double steer = Math.sin((Math.PI / 2) * steerX );
 		double steer = Math.abs(steerX) * steerX;
+
+		steer = -steer;
 		arcadeDrive(pivot ? steer * .4 : throttle * steer, throttle);
 	}
 

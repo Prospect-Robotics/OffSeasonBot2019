@@ -1,5 +1,6 @@
 package com.team2813.frc2019.subsystems;
 
+import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
 import com.team2813.lib.solenoid.PistonSolenoid;
 import com.team2813.lib.solenoid.PistonSolenoid.PistonState;
@@ -33,6 +34,8 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 	private static final Button WHEEL_OUT = SubsystemControlsConfig.mainIntakeWheelOut;
 	private static final Button TOGGLE_MODE = SubsystemControlsConfig.mainIntakeToggleMode;
 
+	private static final Axis FINE_CONTROL = SubsystemControlsConfig.mainIntakeArmFineControl;
+
 	private static final double WHEEL_PERCENT = 1.0;
 
 	MainIntake() {
@@ -64,6 +67,12 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		HOME.whenPressed(() -> setNextPosition(Position.HOME));
 		PLACE_FORWARD.whenPressed(() -> setNextPosition(getPlacePosition(mode, true)));
 		PLACE_REVERSE.whenPressed(() -> setNextPosition(getPlacePosition(mode, false)));
+
+		if (FINE_CONTROL.get() != 0) {
+			periodicIO.percentOutput = FINE_CONTROL.get();
+			this.openLoop = true;
+		}
+
 		if (mode == GamePiece.CARGO) CARGO_PICKUP.whenPressed(() -> setNextPosition(Position.PICKUP_CARGO));
 //		INTAKE_CLOCK.whenPressed(() -> setNextPosition(true));
 //		INTAKE_CLOCK.whenPressed(() -> System.out.println("Main intake button Setting test"));
@@ -128,6 +137,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
 	@Override
 	void setNextPosition(Position position) {
+		this.openLoop = false;
 		currentPosition = position;
 		setPosition(currentPosition);
 	}
@@ -145,7 +155,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 		}
 	}
 	enum Position implements Subsystem1d.Position<MainIntake.Position> {
-		REAR_HATCH (-14.0) { // TODO: 11/01/2019 find correct value
+		REAR_HATCH (13.8) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return REAR_CARGO_SHIP;
@@ -155,8 +165,8 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return PICKUP_CARGO;
 			}
 		},
-		REAR_CARGO_ROCKET(-9.0),
-		REAR_CARGO_SHIP(-3.5) {
+		REAR_CARGO_ROCKET(9.0),
+		REAR_CARGO_SHIP(3.5) {
 			@Override
 			public Position getNextClockwise() {
 				return HOME;
@@ -177,7 +187,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return REAR_CARGO_SHIP;
 			}
 		},
-		FRONT_CARGO_SHIP(3.5) {
+		FRONT_CARGO_SHIP(-3.5) {
 			/*
 			 * 8.3 is too far forward for the cargo ship
 			 * 8.3 is too far back for the rocket
@@ -192,8 +202,8 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 				return HOME;
 			}
 		},
-		FRONT_CARGO_ROCKET(9.0),
-		FRONT_HATCH(13.8) { // TODO: 11/01/2019 find correct value
+		FRONT_CARGO_ROCKET(-9.0),
+		FRONT_HATCH(-14.1) { // TODO: 11/01/2019 find correct value
 			@Override
 			public Position getNextClockwise() {
 				return PICKUP_CARGO;

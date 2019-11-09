@@ -14,6 +14,7 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	private CANSparkMaxWrapper motor;
 	PeriodicIO periodicIO = new PeriodicIO();
 	private boolean zeroed = false;
+	boolean openLoop = false;
 //	Mode mode = Mode.HOLDING;
 
 	Subsystem1d(CANSparkMaxWrapper motor) {
@@ -35,7 +36,10 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 			resetIfAtLimit();
 //			System.out.println(motor.subsystemName+"WritePeriodicOutputs: Demand 2: " + periodicIO.demand);
 //			System.out.println(motor.getPIDController())
-			motor.set(periodicIO.demand, ControlType.kSmartMotion);
+			if (!openLoop)
+				motor.set(periodicIO.demand, ControlType.kSmartMotion);
+			else
+				motor.set(periodicIO.percentOutput, ControlType.kDutyCycle);
 //			motor.set(.4, ControlType.kDutyCycle);
 		} catch(SparkMaxException e) {
 			new SparkMaxException("Subsystem initialization failed", e).printStackTrace();
@@ -87,6 +91,8 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 		boolean limitSwitch;
 
 		double positionTicks;
+
+		double percentOutput;
 	}
 
 	/*==========================
