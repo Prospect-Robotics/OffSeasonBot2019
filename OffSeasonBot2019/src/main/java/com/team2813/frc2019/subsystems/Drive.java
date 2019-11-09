@@ -7,6 +7,9 @@ import com.team2813.lib.controls.Button;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * The Drive subsystem is the main subsystem for
@@ -61,8 +64,36 @@ public class Drive extends Subsystem {
 		ARCADE, CURVATURE
 	}
 
-	private void teleopDrive(TeleopDriveType driveType) {
+	private static final double CORRECTION_MAX_STEER_SPEED = 0.5;
+	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+	NetworkTableEntry tx = table.getEntry("tx");
+	NetworkTableEntry y = table.getEntry("ty");
+	NetworkTableEntry camtranEntry = table.getEntry("camtran");
 
+
+	private double steerToAngle(double targetAngle) {
+		if (Math.abs(tx.getDouble(0) - targetAngle) > 1) {
+			double rawSteer = (tx.getDouble(0) - targetAngle) / 27;
+			return CORRECTION_MAX_STEER_SPEED * (rawSteer + .3);
+		}
+		return 0;
+	}
+
+	private void teleopDrive(TeleopDriveType driveType) {
+		// PATH CORRECTION
+//		double[] camtran = camtranEntry.getDoubleArray(new double[] {0,0,0,0,0,0});
+//		double x = camtran[0] - 10.5;
+//		double y = camtran[1] - 10.5;
+//		double targetAngle = 0;
+//		if (Math.abs(x) > 6) {
+//			targetAngle = Math.toDegrees(Math.atan(y / x));
+//		}
+//		double correctionSteer = steerToAngle(targetAngle);
+//		System.out.println("tx: " + tx.getDouble(0) + " x: " + x + " y: " + y);
+
+//		if (AUTO_BUTTON.getPressed()) {
+//			curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), correctionSteer, true);
+//		} else
 		if (driveType == TeleopDriveType.ARCADE) {
 			arcadeDrive(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
 		} else if (driveType == TeleopDriveType.CURVATURE) {
@@ -71,9 +102,10 @@ public class Drive extends Subsystem {
 	}
 
 	private void curvatureDrive(double throttleForward, double throttleBackward, double steerX, boolean pivot) {
-		double throttle = Math.pow(throttleForward, 2) - Math.pow(throttleBackward, 2);
+//		double throttle = Math.pow(throttleForward, 2) - Math.pow(throttleBackward, 2);
+		double throttle = Math.asin(throttleForward - throttleBackward);
 //        double steer = Math.sin((Math.PI / 2) * steerX );
-		double steer = Math.abs(steerX) * steerX;
+		double steer = Math.asin(steerX);
 
 		steer = -steer;
 		arcadeDrive(pivot ? steer * .4 : throttle * steer, throttle);

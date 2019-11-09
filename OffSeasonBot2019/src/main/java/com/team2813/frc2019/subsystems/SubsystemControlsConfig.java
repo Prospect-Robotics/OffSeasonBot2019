@@ -6,7 +6,7 @@ class SubsystemControlsConfig {
 
 	private static Controller driveJoystick = new Controller(0);
 	static Button pivotButton = driveJoystick.button(1);
-	static Button autoButton = driveJoystick.button(2); // TODO: 10/05/2019 replace with correct button id
+	static Button autoButton = driveJoystick.button(2);
 	static Axis driveX = driveJoystick.axis(0);
 	static Axis driveY = driveJoystick.axis(3);
 	static Axis driveSteer = driveJoystick.axis(0);
