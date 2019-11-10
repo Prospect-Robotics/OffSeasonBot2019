@@ -67,34 +67,19 @@ public class Drive extends Subsystem {
 	private static final double CORRECTION_MAX_STEER_SPEED = 0.5;
 	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 	NetworkTableEntry tx = table.getEntry("tx");
-	NetworkTableEntry y = table.getEntry("ty");
-	NetworkTableEntry camtranEntry = table.getEntry("camtran");
-
-
-	private double steerToAngle(double targetAngle) {
-		if (Math.abs(tx.getDouble(0) - targetAngle) > 1) {
-			double rawSteer = (tx.getDouble(0) - targetAngle) / 27;
-			return CORRECTION_MAX_STEER_SPEED * (rawSteer + .3);
-		}
-		return 0;
-	}
 
 	private void teleopDrive(TeleopDriveType driveType) {
 		// PATH CORRECTION
-//		double[] camtran = camtranEntry.getDoubleArray(new double[] {0,0,0,0,0,0});
-//		double x = camtran[0] - 10.5;
-//		double y = camtran[1] - 10.5;
-//		double targetAngle = 0;
-//		if (Math.abs(x) > 6) {
-//			targetAngle = Math.toDegrees(Math.atan(y / x));
-//		}
-//		double correctionSteer = steerToAngle(targetAngle);
-//		System.out.println("tx: " + tx.getDouble(0) + " x: " + x + " y: " + y);
+		double correctionSteer = 0;
+		if (Math.abs(tx.getDouble(0)) > 0.5) {
+			double rawSteer = tx.getDouble(0) / 27;
+			correctionSteer = CORRECTION_MAX_STEER_SPEED * (Math.pow(rawSteer, 2) * (Math.abs(rawSteer) / rawSteer));
+		}
 
-//		if (AUTO_BUTTON.getPressed()) {
-//			curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), correctionSteer, true);
-//		} else
-		if (driveType == TeleopDriveType.ARCADE) {
+		if (AUTO_BUTTON.get() && Subsystems.MAIN_INTAKE.periodicIO.demand != MainIntake.Position.FRONT_HATCH.getPos() && Subsystems.MAIN_INTAKE.periodicIO.demand != MainIntake.Position.REAR_HATCH.getPos()) {
+			System.out.println("Correction Steer " + correctionSteer);
+			curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), correctionSteer, true);
+		} else if (driveType == TeleopDriveType.ARCADE) {
 			arcadeDrive(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
 		} else if (driveType == TeleopDriveType.CURVATURE) {
 			curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());

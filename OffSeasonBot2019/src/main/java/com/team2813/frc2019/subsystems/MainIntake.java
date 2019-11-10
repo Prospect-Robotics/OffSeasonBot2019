@@ -35,6 +35,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
     private static final Button TOGGLE_MODE = SubsystemControlsConfig.mainIntakeToggleMode;
 
     private static final Axis FINE_CONTROL = SubsystemControlsConfig.mainIntakeArmFineControl;
+    private static final double FINE_CONTROL_DEADZONE = 0.02;
 
     private static final double WHEEL_PERCENT = 1.0;
 
@@ -52,6 +53,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
     protected void outputTelemetry_() throws CTREException, SparkMaxException {
         SmartDashboard.putNumber("MainIntake Demand", periodicIO.demand);
         SmartDashboard.putNumber("MainIntake Position", periodicIO.positionTicks);
+		SmartDashboard.putBoolean("MainIntake Open Loop", periodicIO.openLoop);
         SmartDashboard.putBoolean("Mode", mode == GamePiece.HATCH_PANEL);
     }
 
@@ -68,9 +70,9 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
         PLACE_FORWARD.whenPressed(() -> setNextPosition(getPlacePosition(mode, true)));
         PLACE_REVERSE.whenPressed(() -> setNextPosition(getPlacePosition(mode, false)));
 
-        if (FINE_CONTROL.get() != 0) {
-            periodicIO.percentOutput = FINE_CONTROL.get();
-            this.openLoop = true;
+        if (Math.abs(FINE_CONTROL.get()) > FINE_CONTROL_DEADZONE) {
+            periodicIO.velocity = FINE_CONTROL.get() * 1500;
+            periodicIO.openLoop = true;
         }
 
         if (mode == GamePiece.CARGO) CARGO_PICKUP.whenPressed(() -> setNextPosition(Position.PICKUP_CARGO));
@@ -137,7 +139,6 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
     @Override
     void setNextPosition(Position position) {
-        this.openLoop = false;
         currentPosition = position;
         setPosition(currentPosition);
     }
