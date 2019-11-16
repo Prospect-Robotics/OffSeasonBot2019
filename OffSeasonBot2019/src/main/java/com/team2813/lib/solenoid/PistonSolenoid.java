@@ -8,6 +8,8 @@ import java.util.ArrayList;
  * For pistons keep track of solenoid state as extended/retracted
  * rather than true/false
  *
+ * TODO we should change this to wrap Solenoid
+ *
  * @author Grady Whelan
  */
 public class PistonSolenoid {

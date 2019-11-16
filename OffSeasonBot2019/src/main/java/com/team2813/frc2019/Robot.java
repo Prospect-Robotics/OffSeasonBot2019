@@ -7,12 +7,15 @@
 
 package com.team2813.frc2019;
 
+import com.ctre.phoenix.CANifier;
 import com.team2813.frc2019.loops.Loop;
 import com.team2813.frc2019.subsystems.Drive;
 import com.team2813.frc2019.subsystems.MainIntake;
 import com.team2813.frc2019.subsystems.Subsystem;
 import com.team2813.lib.util.CrashTracker;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +30,12 @@ import static com.team2813.frc2019.subsystems.Subsystems.*;
  * project.
  */
 public class Robot extends TimedRobot {
+
+	private static final double MIN_IDLE_VOLTAGE = 11.7;
+	private static final double MIN_DISABLED_VOLTAGE = 12.0;
+	private static boolean batteryTooLow = false;
+
+	private CANifier caNifier = new CANifier(0);
 
 	{
 		for (Loop subsystem : allSubsystems) {
@@ -61,6 +70,10 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotPeriodic() {
+		boolean disabled = DriverStation.getInstance().isDisabled();
+		double voltage = RobotController.getBatteryVoltage();
+		batteryTooLow = disabled && voltage > MIN_DISABLED_VOLTAGE;
+		SmartDashboard.putBoolean("Replace Battery if Red", disabled ? voltage > MIN_DISABLED_VOLTAGE : voltage > MIN_IDLE_VOLTAGE);
 	}
 
 	@Override
@@ -89,6 +102,10 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		try {
+			// A: Green
+			// B: Red
+			// C: Blue
+			caNifier.setLEDOutput(255, CANifier.LEDChannel.LEDChannelA);
 			CrashTracker.logAutoInit();
 			Compressor compressor = new Compressor(); // FIXME: 11/02/2019 this shouldn't need to be here
 			compressor.start();
