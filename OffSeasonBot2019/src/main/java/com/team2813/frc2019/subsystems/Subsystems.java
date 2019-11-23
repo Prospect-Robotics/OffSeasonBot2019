@@ -10,11 +10,11 @@ import com.team2813.frc2019.loops.Loop;
 
 public class Subsystems {
 
-	public static final List<Subsystem> allSubsystems;
+	public static List<Subsystem> allSubsystems;
 
-	public static final Drive DRIVE;
-	public static final GroundIntake GROUND_INTAKE;
-	public static final MainIntake MAIN_INTAKE;
+	public static Drive DRIVE;
+	public static GroundIntake GROUND_INTAKE;
+	public static MainIntake MAIN_INTAKE;
 	public static final Looper LOOPER = new Looper(RobotMode.DISABLED); //FIXME put looper somewhere else
 
 	private static class SmartDashboardLoop implements Loop{
@@ -29,7 +29,7 @@ public class Subsystems {
 		}
 	};
 
-	static {
+	public static void initializeSubsystems() {
 		DRIVE = new Drive();
 		GROUND_INTAKE = new GroundIntake();
 		MAIN_INTAKE = new MainIntake();

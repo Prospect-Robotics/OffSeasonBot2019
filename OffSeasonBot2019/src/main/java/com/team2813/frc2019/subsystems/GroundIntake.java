@@ -3,6 +3,7 @@ package com.team2813.frc2019.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Button;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
@@ -18,13 +19,13 @@ public class GroundIntake extends Subsystem {
     private final double SLOW_RANGE = 0.5;
     private final double HIGH_PERCENT = 0.3;
     private final double LOW_PERCENT = 0.1;
-    private final CANSparkMaxWrapper MOTOR = SubsystemMotorConfig.groundIntakeArm;
+    private final CANSparkMaxWrapper MOTOR = MotorConfigs.sparks.get("groundIntakeArm");
 
 //    private static final Button ROLLER_OUT = SubsystemControlsConfig.groundIntakeRollerOut;
 //    private static final Button ROLLER_IN = SubsystemControlsConfig.groundIntakeRollerIn;
     private static final Button TOGGLE_POSITION = SubsystemControlsConfig.groundIntakeTogglePosition;
 
-    private static final VictorWrapper ROLLER = SubsystemMotorConfig.groundIntakeRoller;
+    private static final VictorWrapper ROLLER = MotorConfigs.victors.get("groundIntakeRoller");
 	private static final double ROLLER_SPEED = .8;
 
 	GroundIntake() {

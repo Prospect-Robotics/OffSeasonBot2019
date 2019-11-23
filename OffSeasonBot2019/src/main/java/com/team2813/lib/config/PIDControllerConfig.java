@@ -1,5 +1,6 @@
-package com.team2813.frc2019.config.motor;
+package com.team2813.lib.config;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class PIDControllerConfig {
     private double p;
     private double i;

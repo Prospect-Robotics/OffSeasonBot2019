@@ -2,6 +2,7 @@ package com.team2813.frc2019.subsystems;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
+import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
@@ -26,8 +27,8 @@ public class Drive extends Subsystem {
     private static final double WHEEL_CIRCUMFERENCE_INCHES = Math.PI * WHEEL_DIAMETER_INCHES;
 
     // Motor Controllers
-    private static final CANSparkMaxWrapper LEFT = SubsystemMotorConfig.driveLeft;
-    private static final CANSparkMaxWrapper RIGHT = SubsystemMotorConfig.driveRight;
+    private static final CANSparkMaxWrapper LEFT = MotorConfigs.sparks.get("driveLeft");
+    private static final CANSparkMaxWrapper RIGHT = MotorConfigs.sparks.get("driveRight");
     private double right_demand;
     private double left_demand;
     private boolean isBrakeMode;

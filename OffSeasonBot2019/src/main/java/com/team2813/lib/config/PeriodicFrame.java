@@ -1,4 +1,4 @@
-package com.team2813.frc2019.config.motor;
+package com.team2813.lib.config;
 
 import com.revrobotics.CANSparkMaxLowLevel;
 

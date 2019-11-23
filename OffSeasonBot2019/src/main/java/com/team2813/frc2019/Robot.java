@@ -12,6 +12,8 @@ import com.team2813.frc2019.loops.Loop;
 import com.team2813.frc2019.subsystems.Drive;
 import com.team2813.frc2019.subsystems.MainIntake;
 import com.team2813.frc2019.subsystems.Subsystem;
+import com.team2813.frc2019.subsystems.Subsystems;
+import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.util.CrashTracker;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,6 +21,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.io.IOException;
 
 import static com.team2813.frc2019.subsystems.Subsystems.*;
 
@@ -37,12 +41,6 @@ public class Robot extends TimedRobot {
 
 	private CANifier caNifier = new CANifier(0);
 
-	{
-		for (Loop subsystem : allSubsystems) {
-			LOOPER.addLoop(subsystem);
-		}
-	}
-
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -51,9 +49,15 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		try {
 			CrashTracker.logRobotInit();
+			MotorConfigs.read();
+			Subsystems.initializeSubsystems();
 			for (Subsystem subsystem : allSubsystems) {
+				LOOPER.addLoop(subsystem);
 				subsystem.zeroSensors();
 			}
+		} catch (IOException e) {
+			System.out.println("ERROR WHEN READING CONFIG");
+			e.printStackTrace();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
