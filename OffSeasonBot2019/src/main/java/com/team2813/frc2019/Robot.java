@@ -106,6 +106,8 @@ public class Robot extends TimedRobot {
 			// B: Red
 			// C: Blue
 			caNifier.setLEDOutput(255, CANifier.LEDChannel.LEDChannelA);
+			caNifier.setLEDOutput(0, CANifier.LEDChannel.LEDChannelB);
+			caNifier.setLEDOutput(0, CANifier.LEDChannel.LEDChannelC);
 			CrashTracker.logAutoInit();
 			Compressor compressor = new Compressor(); // FIXME: 11/02/2019 this shouldn't need to be here
 			compressor.start();
