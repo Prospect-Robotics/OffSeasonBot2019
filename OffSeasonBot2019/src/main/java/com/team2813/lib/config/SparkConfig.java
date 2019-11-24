@@ -1,13 +1,12 @@
-package com.team2813.frc2019.config.motor;
+package com.team2813.lib.config;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MotorConfig {
-
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class SparkConfig extends MotorConfig {
     private int deviceNumber;
     private MotorType type;
-    private String subsystemName;
     private int peakCurrentDuration;
     private int peakCurrentLimit;
     private boolean enableVoltageCompensation;
@@ -38,14 +37,6 @@ public class MotorConfig {
 
     public void setType(MotorType type) {
         this.type = type;
-    }
-
-    public String getSubsystemName() {
-        return subsystemName;
-    }
-
-    public void setSubsystemName(String subsystemName) {
-        this.subsystemName = subsystemName;
     }
 
     public int getPeakCurrentDuration() {

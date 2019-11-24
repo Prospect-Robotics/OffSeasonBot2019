@@ -1,5 +1,5 @@
 ---
-motors:
+sparks:
   driveLeft: # SPARK MAX
     deviceNumber: 3
     type: BRUSHLESS
@@ -175,4 +175,8 @@ motors:
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
+victors:
+  groundIntakeRoller: # VICTOR SPX
+    deviceNumber: 11
+    subsystemName: GroundIntake
 ...

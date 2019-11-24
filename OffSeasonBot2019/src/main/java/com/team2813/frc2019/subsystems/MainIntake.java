@@ -1,5 +1,6 @@
 package com.team2813.frc2019.subsystems;
 
+import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
 import com.team2813.lib.solenoid.PistonSolenoid;
@@ -22,7 +23,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
     static GamePiece mode = GamePiece.HATCH_PANEL;
 
-    private static CANSparkMaxWrapper wheelMotor = SubsystemMotorConfig.mainIntakeWheel;
+    private static CANSparkMaxWrapper wheelMotor = MotorConfigs.sparks.get("mainIntakeWheel");
 
     private static final Button HOME = SubsystemControlsConfig.mainIntakeHome;
     private static final Button PLACE_FORWARD = SubsystemControlsConfig.mainIntakePlacePieceForward;
@@ -40,7 +41,7 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
     private static final double WHEEL_PERCENT = 1.0;
 
     MainIntake() {
-        super(SubsystemMotorConfig.mainIntakeWrist);
+        super(MotorConfigs.sparks.get("mainIntakeWrist"));
         setNextPosition(Position.HOME);
     }
 
