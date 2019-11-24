@@ -1,13 +1,11 @@
 package com.team2813.lib.sparkMax;
 
-import com.revrobotics.CANError;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
+import com.revrobotics.*;
 import com.team2813.lib.sparkMax.options.InvertType;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
+import edu.wpi.first.wpilibj.Spark;
 
 public class CANSparkMaxWrapper extends CANSparkMax {
 
@@ -21,6 +19,19 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 	 *                 must be connected to their matching color and the hall sensor
 	 *                 plugged in. Brushed motors must be connected to the Red and
 	 */
+	public CANSparkMaxWrapper(int deviceID, String subsystemName, MotorType type) {
+		super(deviceID, type);
+		this.subsystemName = subsystemName;
+	}
+
+	/**
+	 * This constructor only for followers
+	 *
+	 * @param deviceID The device ID.
+	 * @param type     The motor type connected to the controller. Brushless motors
+	 *                 must be connected to their matching color and the hall sensor
+	 *                 plugged in. Brushed motors must be connected to the Red and
+	 */
 	public CANSparkMaxWrapper(int deviceID, MotorType type) {
 		super(deviceID, type);
 	}
@@ -28,10 +39,6 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 	//#region Error
 
 	protected void throwIfNotOk(CANError error) throws SparkMaxException {
-		SparkMaxException.throwIfNotOk(subsystemName, error);
-	}
-
-	protected void throwIfNotOk(ParameterStatus error) throws SparkMaxException {
 		SparkMaxException.throwIfNotOk(subsystemName, error);
 	}
 
@@ -202,6 +209,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 		throwIfNotOk(setEncPosition(position));
 	}
 
+	public double getEncoderPosition() {
+		return getEncoder().getPosition();
+	}
+
 	public void setIntegralAccumulator(double value) throws SparkMaxException {
 		throwIfNotOk(setIAccum(value));
 	}
@@ -216,16 +227,23 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region PID Controller
 
-	public void setRef(double value, ControlType ctrl) throws SparkMaxException {
+	public void set(double value, ControlType ctrl) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl));
 	}
 
-	public void setRef(double value, ControlType ctrl, int pidSlot) throws SparkMaxException {
+	public void set(double value, ControlType ctrl, int pidSlot) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl, pidSlot));
 	}
 
-	public void setRef(double value, ControlType ctrl, int pidSlot, double arbFeedForward) throws SparkMaxException {
+	public void set(double value, ControlType ctrl, int pidSlot, double arbFeedForward) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setReference(value, ctrl, pidSlot, arbFeedForward));
+	}
+
+	public void setPIDF(int slotID, double p, double i, double d, double f) throws SparkMaxException {
+		setP(p, slotID);
+		setI(i, slotID);
+		setD(d, slotID);
+		setF(f, slotID);
 	}
 
 	public void setP(double gain) throws SparkMaxException {
@@ -374,22 +392,46 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#endregion
 
-	//#region Parameter Config
+	//#region Limit Switch
 
-	public void setParam(ConfigParameter parameterID, double value) throws SparkMaxException {
-		throwIfNotOk(setParameter(parameterID, value));
+	public boolean isForwardLimitSwitchClosed() {
+		return getLimitSwitchPolarity(true, CANDigitalInput.LimitSwitchPolarity.kNormallyClosed);
 	}
 
-	public void setParam(ConfigParameter parameterID, int value) throws SparkMaxException {
-		throwIfNotOk(setParameter(parameterID, value));
+	public boolean isReverseLimitSwitchClosed() {
+		return getLimitSwitchPolarity(false, CANDigitalInput.LimitSwitchPolarity.kNormallyClosed);
 	}
 
-	public void setParam(ConfigParameter parameterID, boolean value) throws SparkMaxException {
-		throwIfNotOk(setParameter(parameterID, value));
+	public boolean getLimitSwitchPolarity(boolean forward, CANDigitalInput.LimitSwitchPolarity normal) {
+		return forward ? getForwardLimitSwitch(normal).get() : getReverseLimitSwitch(normal).get();
 	}
 
-	public void setParamCore(ConfigParameter parameterID, ParameterType type, int value) throws SparkMaxException {
-		throwIfNotOk(setParameterCore(parameterID, type, value));
+	//#endregion
+
+	//#region Soft Limit
+
+	public void enableForwardSoftLimit(boolean enable) throws SparkMaxException {
+		enableSoftLimit(true, enable);
+	}
+
+	public void enableReverseSoftLimit(boolean enable) throws SparkMaxException {
+		enableSoftLimit(false, enable);
+	}
+
+	public void enableSoftLimit(boolean forward, boolean enable) throws SparkMaxException {
+		throwIfNotOk(enableSoftLimit(forward ? SoftLimitDirection.kForward : SoftLimitDirection.kReverse, enable));
+	}
+
+	public void setSoftLimit(boolean forward, double position) throws SparkMaxException {
+		throwIfNotOk(setSoftLimit(forward ? SoftLimitDirection.kForward : SoftLimitDirection.kReverse, (float) position));
+	}
+
+	public void setForwardSoftLimit(double position) throws SparkMaxException {
+		setSoftLimit(true, position);
+	}
+
+	public void setReverseSoftLimit(double position) throws SparkMaxException {
+		setSoftLimit(false, position);
 	}
 
 	//#endregion

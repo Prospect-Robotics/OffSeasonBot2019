@@ -3,6 +3,10 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2019.4.1"
 }
 
+repositories {
+    mavenCentral()
+}
+
 def ROBOT_MAIN_CLASS = "com.team2813.frc2019.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
@@ -42,6 +46,10 @@ dependencies {
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     testCompile 'junit:junit:4.12'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.0'
+
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
