@@ -9,10 +9,7 @@ package com.team2813.frc2019;
 
 import com.ctre.phoenix.CANifier;
 import com.team2813.frc2019.loops.Loop;
-import com.team2813.frc2019.subsystems.Drive;
-import com.team2813.frc2019.subsystems.MainIntake;
-import com.team2813.frc2019.subsystems.Subsystem;
-import com.team2813.frc2019.subsystems.Subsystems;
+import com.team2813.frc2019.subsystems.*;
 import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.util.CrashTracker;
 import edu.wpi.first.wpilibj.Compressor;
@@ -39,7 +36,7 @@ public class Robot extends TimedRobot {
 	private static final double MIN_DISABLED_VOLTAGE = 12.0;
 	private static boolean batteryTooLow = false;
 
-	private CANifier caNifier = new CANifier(0);
+	private static Lightshow lightshow = new Lightshow(new CANifier(1));
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -50,6 +47,7 @@ public class Robot extends TimedRobot {
 		try {
 			CrashTracker.logRobotInit();
 			MotorConfigs.read();
+			lightshow.test();
 			Subsystems.initializeSubsystems();
 			for (Subsystem subsystem : allSubsystems) {
 				LOOPER.addLoop(subsystem);
@@ -109,8 +107,8 @@ public class Robot extends TimedRobot {
 			// A: Green
 			// B: Red
 			// C: Blue
-			caNifier.setLEDOutput(255, CANifier.LEDChannel.LEDChannelA);
-			CrashTracker.logAutoInit();
+//			caNifier.setLEDOutput(255, CANifier.LEDChannel.LEDChannelA);
+//			CrashTracker.logAutoInit();
 			Compressor compressor = new Compressor(); // FIXME: 11/02/2019 this shouldn't need to be here
 			compressor.start();
 			MAIN_INTAKE.setMode(MainIntake.GamePiece.HATCH_PANEL);
@@ -157,6 +155,7 @@ public class Robot extends TimedRobot {
 		 * this calls every subsystem's controls method which
 		 * should contain any code to invoke driver controls
 		 */
+		lightshow.test();
 		for (Subsystem subsystem : allSubsystems) {
 			subsystem.teleopControls();
 		}
