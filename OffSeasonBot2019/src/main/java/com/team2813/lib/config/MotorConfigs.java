@@ -91,7 +91,7 @@ public class MotorConfigs {
             if (inverted != null)
                 spark.setInverted(inverted == Inverted.INVERTED);
             else
-                spark.setInverted(com.team2813.lib.sparkMax.options.InvertType.NORMAL.inverted);
+                spark.setInverted(com.team2813.lib.sparkMax.CANSparkMaxWrapper.InvertType.NORMAL.inverted);
 
             for (FollowerConfig followerConfig : config.getFollowers()) {
                 System.out.println(
