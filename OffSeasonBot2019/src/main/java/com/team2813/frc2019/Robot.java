@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
 	private static final double MIN_DISABLED_VOLTAGE = 12.0;
 	private static boolean batteryTooLow = false;
 
-	private static Lightshow lightshow = new Lightshow(new CANifier(1));
+	private static Lightshow lightshow = new Lightshow(9);
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
 		try {
 			CrashTracker.logRobotInit();
 			MotorConfigs.read();
-			lightshow.test();
+			lightshow.enable();
 			Subsystems.initializeSubsystems();
 			for (Subsystem subsystem : allSubsystems) {
 				LOOPER.addLoop(subsystem);
@@ -155,7 +155,7 @@ public class Robot extends TimedRobot {
 		 * this calls every subsystem's controls method which
 		 * should contain any code to invoke driver controls
 		 */
-		lightshow.test();
+//		lightshow.test();
 		for (Subsystem subsystem : allSubsystems) {
 			subsystem.teleopControls();
 		}
