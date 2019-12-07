@@ -5,12 +5,17 @@ import com.revrobotics.ControlType;
 import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
+import com.team2813.lib.drive.ArcadeDrive;
+import com.team2813.lib.drive.CurvatureDrive;
+import com.team2813.lib.drive.DriveDemand;
+import com.team2813.lib.drive.VelocityDrive;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * The Drive subsystem is the main subsystem for
@@ -71,7 +76,39 @@ public class Drive extends Subsystem {
     NetworkTableEntry tx = table.getEntry("tx");
     NetworkTableEntry camtranEntry = table.getEntry("camtran");
 
+    private static final int MAX_VELOCITY = 18000; // max velocity of velocity drive in rpm
+    VelocityDrive velocityDrive = new VelocityDrive(MAX_VELOCITY, 45000);
+    CurvatureDrive curvatureDrive = new CurvatureDrive(TELEOP_DEAD_ZONE);
+    ArcadeDrive arcadeDrive = curvatureDrive.getArcadeDrive();
+    DriveDemand driveDemand = new DriveDemand(0, 0);
+
+    private NetworkTableEntry velocityEntry = Shuffleboard.getTab("Tuning")
+            .addPersistent("Bruh", 0).getEntry();
+    private boolean velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
+    private boolean velocityFailed = false;
+
+    Drive() {
+        try {
+            velocityDrive.configureMotor(LEFT);
+            velocityDrive.configureMotor(RIGHT);
+
+            // be sure they're inverted correctly
+            LEFT.setInverted(LEFT.getConfig().getInverted());
+            RIGHT.setInverted(RIGHT.getConfig().getInverted());
+        } catch (SparkMaxException e) {
+            velocityFailed = true;
+            e.printStackTrace();
+        }
+    }
+
     private void teleopDrive(TeleopDriveType driveType) {
+        velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
+//        if (!(CURVATURE_FORWARD.get() > 0 && CURVATURE_REVERSE.get() > 0)) {
+//            velocityDrive.setAccelerating(false);
+//        } else {
+//            velocityDrive.setAccelerating(true);
+//        }
+
         // PATH CORRECTION
         double[] camtran = camtranEntry.getDoubleArray(new double[]{0, 0, 0, 0, 0, 0});
         double x = camtran[0];
@@ -85,13 +122,17 @@ public class Drive extends Subsystem {
             correctionSteer = CORRECTION_MAX_STEER_SPEED * (Math.pow(rawSteer, 2) * (Math.abs(rawSteer) / rawSteer));
         }
 
+        if (PIVOT_BUTTON.get()) {
+
+        }
+
         if (AUTO_BUTTON.get() && Subsystems.MAIN_INTAKE.periodicIO.demand != MainIntake.Position.FRONT_HATCH.getPos() && Subsystems.MAIN_INTAKE.periodicIO.demand != MainIntake.Position.REAR_HATCH.getPos()) {
             System.out.println("Correction Steer " + correctionSteer);
-            curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), correctionSteer, true);
+            driveDemand = curvatureDrive.getDemand(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), correctionSteer, true);
         } else if (driveType == TeleopDriveType.ARCADE) {
-            arcadeDrive(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
+            driveDemand = arcadeDrive.getDemand(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
         } else if (driveType == TeleopDriveType.CURVATURE) {
-            curvatureDrive(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());
+            driveDemand = curvatureDrive.getDemand(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());
         }
     }
 
@@ -176,8 +217,15 @@ public class Drive extends Subsystem {
     }
 
     protected synchronized void writePeriodicOutputs_() throws SparkMaxException {
-        RIGHT.set(right_demand, driveMode.controlType);
-        LEFT.set(left_demand, driveMode.controlType);
+        if (!velocityFailed && velocityEnabled) {
+            double leftVelocity = velocityDrive.getVelocityFromDemand(driveDemand.getLeft());
+            double rightVelocity = velocityDrive.getVelocityFromDemand(driveDemand.getRight());
+            LEFT.set(leftVelocity, ControlType.kSmartVelocity);
+            RIGHT.set(rightVelocity, ControlType.kSmartVelocity);
+        } else {
+            LEFT.set(driveDemand.getLeft(), driveMode.controlType);
+            RIGHT.set(driveDemand.getRight(), driveMode.controlType);
+        }
     }
 
     public synchronized void setBrakeMode(boolean brake) {

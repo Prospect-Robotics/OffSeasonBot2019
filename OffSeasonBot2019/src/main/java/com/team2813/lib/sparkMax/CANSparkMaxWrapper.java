@@ -1,6 +1,8 @@
 package com.team2813.lib.sparkMax;
 
 import com.revrobotics.*;
+import com.team2813.lib.config.Inverted;
+import com.team2813.lib.config.SparkConfig;
 import com.team2813.lib.sparkMax.options.InvertType;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj.Spark;
 public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public String subsystemName;
+	public SparkConfig config;
 
 	/**
 	 * Create a new SPARK MAX Controller
@@ -432,6 +435,21 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public void setReverseSoftLimit(double position) throws SparkMaxException {
 		setSoftLimit(false, position);
+	}
+
+	public void setInverted(Inverted isInverted) {
+		if (isInverted == Inverted.INVERTED)
+			super.setInverted(true);
+		else
+			super.setInverted(false);
+	}
+
+	public SparkConfig getConfig() {
+		return config;
+	}
+
+	public void setConfig(SparkConfig config) {
+		this.config = config;
 	}
 
 	//#endregion
