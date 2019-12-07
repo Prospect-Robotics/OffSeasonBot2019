@@ -58,6 +58,7 @@ public class Drive extends Subsystem {
     private static double limelightDegrees = 0.0; // TODO: 10/05/2019 replace with actual Limelight angle
     private static final double ALLOWABLE_LIMELIGHT_ERROR = 0.0; // TODO: 10/05/2019 replace with actual allowable angle error
     private static final double MIN_AUTO_POS_CHANGE = 0.0; // TODO: 10/05/2019 tune
+    private static boolean purePursuit = false;
 //	private static final double MIN_AUTO_SPEED_FPS = 0.33; // TODO: 10/05/2019 tune
 //	private static final double MIN_AUTO_SPEED_ENCODER_TICKS = MIN_AUTO_SPEED_FPS * ENCODER_TICKS_PER_FOOT;
 
@@ -154,11 +155,16 @@ public class Drive extends Subsystem {
             driveMode = DriveMode.OPEN_LOOP;
             teleopDrive(TELEOP_DRIVE_TYPE);
         } else {
-            driveMode = DriveMode.SMART_MOTION;
-            AUTO_BUTTON.whenPressed(() -> {
-                while (Math.abs(limelightDegrees) > ALLOWABLE_LIMELIGHT_ERROR)
-                    autoDrive(limelightDegrees);
-            });
+            if (purePursuit) {
+                setPurePursuitVelocities();
+            } else {
+                startPurePursuit();
+            }
+//            driveMode = DriveMode.SMART_MOTION;
+//            AUTO_BUTTON.whenPressed(() -> {
+//                while (Math.abs(limelightDegrees) > ALLOWABLE_LIMELIGHT_ERROR)
+//                    autoDrive(limelightDegrees);
+//            });
         }
     }
 
@@ -192,6 +198,19 @@ public class Drive extends Subsystem {
             }
         }
     }
+
+        private void setPurePursuitVelocities() {
+            driveMode = DriveMode.VELOCITY;
+            // replace with pure pursuit method call to give enc values
+            // replace with pure pursuit method call to get and set left_demand
+            // replace with pure pursuit method call to get and set right_demand
+            // need to set purePursuit to false when finished
+        }
+
+        private void startPurePursuit() {
+            purePursuit = true;
+            // add any code needed here to start pure pursuit
+        }
 
     private enum DriveMode {
         OPEN_LOOP(ControlType.kDutyCycle),
