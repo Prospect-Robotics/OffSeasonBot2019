@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import static java.awt.geom.Point2D.*;
 
 public class PurePursuit {
-    public ArrayList<Point2D> getLocation(double rightEncoderVal, double leftEncoderVal, ArrayList<Point2D> coordinates) {
+    // finds coordinate location of the robot
+    public Point2D getLocation(double rightEncoderVal, double leftEncoderVal) {
         double currentRightVal = 0.0;
         double currentLeftVal = 0.0;
         double robot_angle = 0.0; //radians
@@ -18,7 +19,12 @@ public class PurePursuit {
         double xVal = dist * Math.cos(robot_angle);
         double yVal = dist * Math.sin(robot_angle);
         location.setLocation(xVal, yVal);
-        coordinates.add(location);
-        return coordinates;
+        return location;
+    }
+    public ArrayList<Point2D> injectPoints(ArrayList<Point2D> path,Point2D startPosition, Point2D endPosition, double spacing){
+        Point2D vector = new Point2D.Double();
+        double xDif = endPosition.getX() - startPosition.getX();
+        double yDif = endPosition.getY() - startPosition.getY();
+        vector.setLocation(xDif, yDif);
     }
 }
