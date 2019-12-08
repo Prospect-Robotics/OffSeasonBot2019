@@ -12,6 +12,13 @@ public class Logger {
 		return logLevel.canSee(level);
 	}
 
+	/**
+	 * Log objects with a delimeter (e.g. comma) between objects
+	 * @param level of logging
+	 * @param delimeter to go between objects
+	 * @param first object before first delimiter
+	 * @param objects at end, separated by delimeter
+	 */
 	public static void logDelim(LogLevel level, String delimeter, Object first, Object...objects){
 		if(!shouldLog(level)) return;
 
@@ -27,14 +34,31 @@ public class Logger {
 		level.printStream.println(sb);
 	}
 
+	/**
+	 * Log any number of object parameters separated with delimeter " "
+	 * @param level of logging
+	 * @param first object
+	 * @param objects following
+	 */
 	public static void log(LogLevel level, Object first, Object...objects){
 		logDelim(level, " ", first, objects);
 	}
-	
+
+	/**
+	 * Log a throwable
+	 * @param level of logging
+	 * @param t throwable
+	 */
 	public static void log(LogLevel level, Throwable t){
 		if(shouldLog(level)) t.printStackTrace(level.printStream);
 	}
 
+	/**
+	 * Log formatted just like printf
+	 * @param level
+	 * @param format
+	 * @param args
+	 */
 	public static void logf(LogLevel level, String format, Object...args){
 		if(shouldLog(level)) level.printStream.printf(format, args);
 	}

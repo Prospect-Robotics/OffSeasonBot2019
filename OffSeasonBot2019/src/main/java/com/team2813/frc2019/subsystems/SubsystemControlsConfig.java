@@ -2,6 +2,14 @@ package com.team2813.frc2019.subsystems;
 
 import com.team2813.lib.controls.*;
 
+/**
+ * Stores all of the controllers and their buttons and axes.
+ * Controllers are private as they should never be accessed,
+ * to make it easier to move a Button or Axis to a different
+ * controller.
+ *
+ * TODO encapsulate Buttons and Axes
+ */
 class SubsystemControlsConfig {
 
 	private static Controller driveJoystick = new Controller(0);
