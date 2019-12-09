@@ -21,10 +21,15 @@ public class PurePursuit {
         location.setLocation(xVal, yVal);
         return location;
     }
-    public ArrayList<Point2D> injectPoints(ArrayList<Point2D> path,Point2D startPosition, Point2D endPosition, double spacing){
-        Point2D vector = new Point2D.Double();
-        double xDif = endPosition.getX() - startPosition.getX();
-        double yDif = endPosition.getY() - startPosition.getY();
-        vector.setLocation(xDif, yDif);
+    //injects points
+    public ArrayList<Point2D> injectPoints(ArrayList<Point2D> path, double spacing){
+        for(int i = 0; i < path.size(); i++){
+            Point2D startPosition = path.get(i);
+            Point2D endPosition = path.get(i + 1);
+            double xDif = endPosition.getX() - startPosition.getX();
+            double yDif = endPosition.getY() - startPosition.getY();
+            Point2D vector = new Point2D.Double();
+            vector.setLocation(xDif, yDif);
+        }
     }
 }
