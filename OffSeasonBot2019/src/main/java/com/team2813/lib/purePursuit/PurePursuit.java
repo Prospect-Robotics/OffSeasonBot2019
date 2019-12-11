@@ -47,4 +47,38 @@ public class PurePursuit {
         }
         return path;
     }
+    public ArrayList<Point2D> smoother(ArrayList<Point2D> path, double a, double b, double tolerance){
+        double change = tolerance;
+        double newX = 0.0;
+        double newY = 0.0;
+        double x;
+        double y;
+        ArrayList<Point2D> newPath = new ArrayList<Point2D>();
+        for(int i = 0; i < path.size(); i++){
+            newPath.add(path.get(i));
+        }
+        while(change >= tolerance){
+            change = 0.0;
+            for(int i = 1; i < path.size() - 1; i++){
+                for(int j = 0; j < 2; j++){
+                    if(j == 0){
+                        x = path.get(i).getX();
+                        double aux = newPath.get(i).getX();
+                        newX = newPath.get(i).getX();
+                        newX += a * (x - aux) + b * (newPath.get(i - 1).getX() + newPath.get(i + 1).getX()) - (2.0 * aux);
+                        change += Math.abs(aux - newX);
+                    }
+                    if(j == 1){
+                        y = path.get(i).getY();
+                        double aux = newPath.get(i).getY();
+                        newY = newPath.get(i).getY();
+                        newY += a * (y - aux) + b * (newPath.get(i - 1).getY() + newPath.get(i + 1).getY()) - (2.0 * aux);
+                        change += Math.abs(aux - newY);
+                    }
+                }
+                newPath.get(i).setLocation(newX, newY);
+            }
+        }
+        return newPath;
+    }
 }
