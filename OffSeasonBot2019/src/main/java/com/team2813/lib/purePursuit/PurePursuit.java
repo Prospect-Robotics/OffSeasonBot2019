@@ -47,6 +47,7 @@ public class PurePursuit {
         }
         return path;
     }
+    //smooths path
     public ArrayList<Point2D> smoother(ArrayList<Point2D> path, double a, double b, double tolerance){
         double change = tolerance;
         double newX = 0.0;
@@ -80,5 +81,20 @@ public class PurePursuit {
             }
         }
         return newPath;
+    }
+    //calculates the distance between points
+    public double[] distancePoints(ArrayList<Point2D> path){
+        double xDif;
+        double yDif;
+        double[] distancePoints = new double[path.size()];
+        xDif = path.get(0).getX() - path.get(1).getX();
+        yDif = path.get(0).getY() - path.get(1).getY();
+        distancePoints[0] = Math.sqrt((xDif * xDif) + (yDif * yDif));
+        for(int i = 1; i < path.size(); i++){
+            xDif = path.get(i).getX() - path.get(i - 1).getX();
+            yDif = path.get(i).getY() - path.get(i - 1).getY();
+            distancePoints[i] = distancePoints[i - 1] + Math.sqrt((xDif * xDif) + (yDif * yDif));
+        }
+        return distancePoints;
     }
 }
