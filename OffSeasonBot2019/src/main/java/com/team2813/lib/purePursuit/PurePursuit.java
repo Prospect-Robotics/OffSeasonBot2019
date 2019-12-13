@@ -97,4 +97,21 @@ public class PurePursuit {
         }
         return distancePoints;
     }
+    //finds the curvature of the path at a given point
+    public double findCurvature(Point2D P, Point2D Q, Point2D R){
+        double x1 = P.getX() + 0.001;
+        double y1 = P.getY();
+        double x2 = Q.getX();
+        double y2 = Q.getY();
+        double x3 = R.getX();
+        double y3 = R.getY();
+        double k1 = 0.5 * (((x1 * x1) + (y1 * y1)) - ((x2 * x2) + (y2 * y2)))/(x1 - x2);
+        double k2 = (y1 - y2)/(x1 - x2);
+        double b = 0.5 * ((x2 * x2) - (2 * x2 * k1) + (y2 * y2) - (x3 * x3) + (2 * x3 * k1) - (y3 * y3))/(x3 * k2 - y3 +
+                y2 - x2 * k2);
+        double a = k1 - k2 * b;
+        double r = Math.sqrt(((x1 - a) * (x1 - a)) + ((y1 - b) * (y1 -b)));
+        double curvature = 1 / r;
+        return curvature;
+    }
 }
