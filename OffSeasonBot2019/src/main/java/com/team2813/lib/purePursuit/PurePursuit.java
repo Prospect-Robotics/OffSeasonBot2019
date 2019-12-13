@@ -114,4 +114,13 @@ public class PurePursuit {
         double curvature = 1 / r;
         return curvature;
     }
+    public double[] findPathCurvature(ArrayList<Point2D> path){
+        double[] pathCurvature = new double[path.size()];
+        pathCurvature[0] = 0.0;
+        for(int i = 1; i < path.size() - 1; i++){
+            pathCurvature[i] = findCurvature(path.get(i), path.get(i - 1), path.get(i + 1));
+        }
+        pathCurvature[path.size() - 1] = 0.0;
+        return pathCurvature;
+    }
 }
