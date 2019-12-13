@@ -114,6 +114,7 @@ public class PurePursuit {
         double curvature = 1 / r;
         return curvature;
     }
+    //returns an array with the curvature of the path at each point
     public double[] findPathCurvature(ArrayList<Point2D> path){
         double[] pathCurvature = new double[path.size()];
         pathCurvature[0] = 0.0;
@@ -123,4 +124,5 @@ public class PurePursuit {
         pathCurvature[path.size() - 1] = 0.0;
         return pathCurvature;
     }
+    
 }
