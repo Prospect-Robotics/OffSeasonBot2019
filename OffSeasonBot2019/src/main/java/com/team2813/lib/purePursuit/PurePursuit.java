@@ -15,17 +15,20 @@ public class PurePursuit {
     public double[][] origRightVelocity;
     public double[][] origLeftVelocity;
 
-    //smooth velocity
+    //smooth velocity // how are the data points stored?
     public double[][] smoothCenterVelocity;
     public double[][] smoothRightVelocity;
     public double[][] smoothLeftVelocity;
 
-    //accumulated heading
+    //accumulated heading // What is heading?
     public double[][] heading;
 
     double totalTime;
     double totalDistance;
     double numFinalPoints;
+
+    double targetX;
+    double targetY;
 
 
     public double pAlpha, pBeta, pTolerance; //pathing variables for path injecting algorithm
@@ -40,11 +43,18 @@ public class PurePursuit {
         return smoothLeftVelocity[1][1];
     }
 
-    public PurePursuit(double[][] path) {
+    public boolean done() {
+        if(origPath[1][0] == targetX && origPath[1][1] == targetY){
+            return true;
+        }
+        return false;
+    }
 
-        this.origPath = doubleArrayCopy(path);
+    public PurePursuit(double targetX, double targetY) {
 
-        // ^ copy array from PATH into INPUTPATH, essentially creating an implementable constructor
+        //this.origPath = doubleArrayCopy(path);
+
+        // ^ copy array from PATH into INPUTPATH, essentially creating an implementable constructors
 
         this.pAlpha = 0.7;
         this.pBeta = 0.3;
@@ -54,6 +64,18 @@ public class PurePursuit {
         this.vBeta = 0.3;
         this.vTolerance = 0.0000001;
 
+        //this.encoderRotationRight = encoderRotationRight;
+        //this.encoderRotationLeft = encoderRotationLeft;
+        this.targetX = targetX;
+        this.targetY = targetY;
+
+        // odometry to create x/y for original path
+
+        double[][] path = new double[2][2];
+        path[0][0] = 0; path[0][1] = 0;
+        path[1][0] = targetX; path[1][1] = targetY;
+
+        this.origPath = doubleArrayCopy(path);
     }
 
     public static void print(double[] path){ // printing framework for basic double arrays. Makes things easy to comprehend!
@@ -84,10 +106,7 @@ public class PurePursuit {
 
     public double[][] inject(double[][] orig, int numToInject)
     {
-        double morePoints[][];
-
-        //create extended 2 Dimensional array to hold additional points
-        morePoints = new double[orig.length + ((numToInject)*(orig.length-1))][2];
+        double[][] morePoints = new double[orig.length + ((numToInject)*(orig.length-1))][2];
 
         int index = 0;
 
@@ -144,27 +163,25 @@ public class PurePursuit {
     public static double[][] nodeOnlyWayPoints(double[][] path)
     {
 
+        // this function takes a list of coordinates and returns a double matrix with coordinates of the original list that have a change in velocity
+
         List<double[]> li = new LinkedList<double[]>();
 
-        //save first value
         li.add(path[0]);
 
-        //find intermediate nodes
         for(int i=1; i<path.length-1; i++)
         {
-            //calculate direction
+            //calculate direction - Math.atan2 function returns the theta component of polar coordinates.
             double vector1 = Math.atan2((path[i][1]-path[i-1][1]),path[i][0]-path[i-1][0]);
             double vector2 = Math.atan2((path[i+1][1]-path[i][1]),path[i+1][0]-path[i][0]);
 
-            //determine if both vectors have a change in direction
             if(Math.abs(vector2-vector1)>=0.01)
                 li.add(path[i]);
         }
 
-        //save last
         li.add(path[path.length-1]);
 
-        //re-write nodes into new 2D Array
+        // put the updated coords into an array
         double[][] temp = new double[li.size()][2];
 
         for (int i = 0; i < li.size(); i++)
@@ -278,13 +295,6 @@ public class PurePursuit {
         return difference;
     }
 
-    public int odometryX() {
-        return -1;
-    }
-    public int odometryY() {
-        return -1;
-    }
-
     public int[] injectionCounter2Steps(double numNodeOnlyPoints, double maxTimeToComplete, double timeStep)
     {
         int first = 0;
@@ -388,45 +398,11 @@ public class PurePursuit {
                 if((deg-gradient[i-1][1])<-180)
                     gradient[i][1] = 360+deg;
             }
-
-
-
         }
 
         this.heading = gradient;
         this.leftPath = leftPath;
         this.rightPath = rightPath;
-    }
-
-    public static double[] getXVector(double[][] arr)
-    {
-        double[] temp = new double[arr.length];
-
-        for(int i=0; i<temp.length; i++)
-            temp[i] = arr[i][0];
-
-        return temp;
-    }
-
-    public static double[] getYVector(double[][] arr)
-    {
-        double[] temp = new double[arr.length];
-
-        for(int i=0; i<temp.length; i++)
-            temp[i] = arr[i][1];
-
-        return temp;
-    }
-
-    public static double[][] transposeVector(double[][] arr)
-    {
-        double[][] temp = new double[arr[0].length][arr.length];
-
-        for(int i=0; i<temp.length; i++)
-            for(int j=0; j<temp[i].length; j++)
-                temp[i][j] = arr[j][i];
-
-        return temp;
     }
 
     public void calculate(double totalTime, double timeStep, double robotTrackWidth)
@@ -437,12 +413,12 @@ public class PurePursuit {
         nodeOnlyPath = nodeOnlyWayPoints(origPath);
 
         //Figure out how many nodes to inject
-        int[] inject = injectionCounter2Steps(nodeOnlyPath.length, totalTime, timeStep);
+        int[] inject = injectionCounter2Steps(nodeOnlyPath.length, totalTime, timeStep); // what exactly do {f, s, t} represent? what are they used for?
 
         //iteratively inject and smooth the path
         for(int i=0; i<inject.length; i++)
         {
-            if(i==0)
+            if(i==0) //runs once, can it be implemented before the for loop
             {
                 smoothPath = inject(nodeOnlyPath,inject[0]);
                 smoothPath = smoother(smoothPath, pAlpha, pBeta, pTolerance);
@@ -482,30 +458,17 @@ public class PurePursuit {
         smoothRightVelocity = velocityFix(smoothRightVelocity, origRightVelocity, 0.0000001);
 
         for(int i = 0; i < smoothRightVelocity.length; i++){
-            for(int j = 0; j < smoothRightVelocity[1].length; j++){
+            for(int j = 0; j < smoothRightVelocity[0].length; j++){
                 System.out.println(smoothRightVelocity[i][j]);
             }
+            System.out.println();
         }
     }
-    // ===================================================== !! MAIN METHOD HERE !! ===================================================
-
 
     public static void main(String[] args){
-        double[][] waypoints = new double[][]{
-                {1, 1},
-                {5, 1},
-                {9, 12},
-                {12, 9},
-                {15, 6},
-                {19, 12}
-        };
-
-        double totalTime = 8; //seconds
-        double timeStep = 0.1; //period of control loop on Rio, seconds
-        double robotTrackWidth = 2; //distance between left and right wheels, feet
-
-        final PurePursuit path = new PurePursuit(waypoints);
-        path.calculate(totalTime, timeStep, robotTrackWidth);
+        /*
+        final PurePursuit path = new PurePursuit(12, 15);
+        path.calculate(8, 0.1, 2.5); // TODO: find exact width
+         */
     }
-
 }

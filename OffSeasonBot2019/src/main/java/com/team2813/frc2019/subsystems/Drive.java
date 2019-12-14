@@ -5,6 +5,7 @@ import com.revrobotics.ControlType;
 import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
+import com.team2813.lib.purePursuit.PurePursuit;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
@@ -61,6 +62,10 @@ public class Drive extends Subsystem {
     private static boolean purePursuit = false;
 //	private static final double MIN_AUTO_SPEED_FPS = 0.33; // TODO: 10/05/2019 tune
 //	private static final double MIN_AUTO_SPEED_ENCODER_TICKS = MIN_AUTO_SPEED_FPS * ENCODER_TICKS_PER_FOOT;
+
+    private PurePursuit path;
+    private double targetX = 0;
+    private double targetY = 0;
 
     public enum TeleopDriveType {
         ARCADE, CURVATURE
@@ -199,18 +204,21 @@ public class Drive extends Subsystem {
         }
     }
 
-        private void setPurePursuitVelocities() {
-            driveMode = DriveMode.VELOCITY;
-            // replace with pure pursuit method call to give enc values
-            // replace with pure pursuit method call to get and set left_demand
-            // replace with pure pursuit method call to get and set right_demand
-            // need to set purePursuit to false when finished
-        }
+    private void setPurePursuitVelocities() {
+        driveMode = DriveMode.VELOCITY;
+        // replace with pure pursuit method call to give enc values
+        right_demand = path.getRightVelocity();
+        left_demand = path.getLeftVelocity();
+        // need to set purePursuit to false when finished TODO: must be in if statement
+        purePursuit = !path.done();
+    }
 
-        private void startPurePursuit() {
-            purePursuit = true;
-            // add any code needed here to start pure pursuit
-        }
+    private void startPurePursuit() {
+        purePursuit = true;
+        // add any code needed here to start pure pursuit
+        path = new PurePursuit(targetX, targetY);
+        path.calculate(8, 0.1, 2);
+    }
 
     private enum DriveMode {
         OPEN_LOOP(ControlType.kDutyCycle),
