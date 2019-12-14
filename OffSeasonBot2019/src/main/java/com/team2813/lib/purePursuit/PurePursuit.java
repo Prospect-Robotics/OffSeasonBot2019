@@ -124,5 +124,28 @@ public class PurePursuit {
         pathCurvature[path.size() - 1] = 0.0;
         return pathCurvature;
     }
-    
+    //returns an array with target velocities for each point
+    public double[] pathVelocity(double[] pathCurvature, double maxVelocity, double minVelocity, double k){
+        double min;
+        double[] pathVelocity = new double[pathCurvature.length];
+        for(int i = 0; i < pathVelocity.length; i++){
+            min = k / pathCurvature[i];
+            try{
+                min = k / pathCurvature[i];
+            }
+            catch (ArithmeticException e){
+                min = minVelocity;
+            }
+            if(maxVelocity > min){
+                pathVelocity[i] = min;
+            }
+            else if(maxVelocity < min){
+                pathVelocity[i] = maxVelocity;
+            }
+            else{
+                pathVelocity[i] = min;
+            }
+        }
+        return pathVelocity;
+    }
 }
