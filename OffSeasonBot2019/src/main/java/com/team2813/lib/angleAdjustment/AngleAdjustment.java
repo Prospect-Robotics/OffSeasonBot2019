@@ -20,7 +20,6 @@ public class AngleAdjustment {
         WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
         GEAR_RATIO = gearRatio;
         calculate();
-        // 42 counts per rev
         //TODO convert degrees to encoder values which the left and right must travel
     }
 
