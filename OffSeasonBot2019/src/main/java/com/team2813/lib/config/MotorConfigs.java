@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
+import com.team2813.lib.talon.CTREException;
+import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
+import com.team2813.lib.talon.options.InvertType;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Talon;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +38,72 @@ public class MotorConfigs {
 
         System.out.println("Successful!");
     }
+
+    private static <TalonException> TalonWrapper initializeTalon(TalonConfig config) throws TalonException, CTREException, SparkMaxException {
+        for (Integer id : ids)
+            if (id == config.getDeviceNumber()){
+                System.err.println("Tried to register talon with already used id");
+            }
+        ids.add(config.getDeviceNumber());
+
+        System.out.println("Configuring" + config.getSubsystemName());
+
+        TalonWrapper talon = new TalonWrapper(config.getDeviceNumber(), config.getSubsystemName(), config.getMotorType().getValue());
+
+        talon.setFactoryDefaults();
+
+//                talon.setPeakCurrentDuration(config.getPeakCurrentDuration());
+        talon.setCurrLimit(config.getPeakCurrentLimit());
+
+        talon.enableVoltageCompensation(config.setCompSaturationVoltage());
+
+        talon.setOpenLoopRamp(config.getOpenLoopRampRate());
+        talon.setClosedLoopRamp(config.getClosedLoopRampRate());
+
+        talon.setPeriodicFrame(config.getStatusFrame().getValue(), config.getStatusFramePeriod());
+//					talon.setSmartMotionMaxVelocity(config.motionCruiseVelocity()); // FIXME: 09/20/2019 need to change parameters/types
+//					talon.setSmartMotionMaxAccel(config.motionAcceleration()); // FIXME: 09/20/2019 need to change parameters/types
+
+        talon.setSecondaryCurrLimit(config.getContinuousCurrentLimitAmps());// TODO check this is actually continuous limit
+
+//			for (com.team2813.lib.talon.options.HardLimitSwitch hardLimitSwitch : field.getAnnotationsByType(com.team2813.lib.talon.options.HardLimitSwitch.class)) {
+//				System.out.println("\tconfiguring hard limit switch " + hardLimitSwitch.direction());
+//				// FIXME remake limit switch stuff differently since it is called differently -- Grady 10/30 I'm not sure this is how it works for Spark Maxs
+//			}
+//
+//			for (com.team2813.lib.talon.options.SoftLimit softLimit : field.getAnnotationsByType(com.team2813.lib.talon.options.SoftLimit.class)) {
+//				System.out.println("\tconfiguring soft limit " + softLimit.direction());
+//
+//				//FIXME remake limit switch stuff differently
+//			}
+
+
+        for (PIDControllerConfig pidController : config.getPidControllers()) {
+            int slotID = config.getPidControllers().indexOf(pidController);
+            talon.setPIDF(slotID, pidController.getP(), pidController.getI(),
+                    pidController.getD(), pidController.getF());
+            talon.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
+            talon.getPIDController().setSmartMotionMaxAccel(pidController.getMaxAcceleration(), slotID);
+            talon.getPIDController().setSmartMotionMinOutputVelocity(pidController.getMinVelocity(), slotID);
+        }
+
+
+        Inverted inverted = config.getInverted();
+        if (inverted != null)
+            talon.setInverted(inverted == Inverted.INVERTED);
+        else
+            talon.setInverted(InvertType.NORMAL.inverted);
+
+        for (FollowerConfig followerConfig : config.getFollowers()) {
+            System.out.println(
+                    "\tCreating follower w/ id of " + followerConfig.getId() + " on " + config.getSubsystemName()
+            );
+            CANSparkMaxWrapper talonFollower = new CANSparkMaxWrapper(followerConfig.getId(), followerConfig.getType().getValue());
+            talonFollower.follow(talon, followerConfig.getInverted().inverted);
+        }
+
+        return talon;
+        }
 
     private static CANSparkMaxWrapper initializeSpark(SparkConfig config) {
         for (Integer id : ids)

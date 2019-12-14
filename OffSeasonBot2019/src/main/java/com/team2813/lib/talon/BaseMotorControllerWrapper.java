@@ -7,6 +7,7 @@ import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.talon.options.LimitDirection;
 import com.team2813.lib.talon.options.PIDProfile;
 
@@ -103,8 +104,9 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	 * @throws CTREException
 	 * @see BaseMotorController#setInverted(InvertType)
 	 * @see InvertType
+	 * @param type
 	 */
-	public void setInverted(InvertType type) throws CTREException {
+	public void setInverted(boolean type) throws CTREException {
 		invertType = type;
 		motorController.setInverted(type);
 		throwLastError();
@@ -645,7 +647,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 		throwIfNotOk(motorController.config_kF(slot.id, f, timeoutMode.value));
 	}
 
-	public void setPIDF(PIDProfile.Profile slot, double p, double i, double d, double f) throws CTREException {
+	public void setPIDF(int slot, double p, double i, double d, double f) throws CTREException {
 		setP(slot, p);
 		setI(slot, i);
 		setD(slot, d);
@@ -739,6 +741,12 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 			else if (direction == LimitDirection.REVERSE) setParameter(ParamEnum.eClearPositionOnLimitR, value, subValue, ordinal);
 		}
 	}
+
+	public abstract void setCurrLimit(int peakCurrentLimit);
+
+	public abstract void setSecondaryCurrLimit(int continuousCurrentLimitAmps);
+
+	public abstract CANSparkMaxWrapper getPIDController();
 
 	// TODO document
 	public enum TimeoutMode {

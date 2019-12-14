@@ -434,6 +434,9 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 		setSoftLimit(false, position);
 	}
 
-	//#endregion
+    public void follow(TalonWrapper talon, boolean inverted) {
+    }
+
+    //#endregion
 
 }
