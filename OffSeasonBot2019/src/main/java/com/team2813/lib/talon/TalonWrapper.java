@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.CANSparkMaxLowLevel;
 import com.team2813.lib.talon.options.LimitDirection;
 
 public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
@@ -21,7 +22,11 @@ public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
 		this(deviceNumber, "");
 	}
 
-	public SensorCollection getSensorCollection() throws CTREException {
+    public TalonWrapper(int deviceNumber, String subsystemName, CANSparkMaxLowLevel.MotorType value) {
+        super();
+    }
+
+    public SensorCollection getSensorCollection() throws CTREException {
 		return throwIfNotOkElseReturn(motorController.getSensorCollection());
 	}
 	
@@ -88,4 +93,9 @@ public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
 			setReverseLimitSwitchSource(type, normalOpenOrClose);
 		}
 	}
+
+    @Override
+    public void setCurrLimit(int peakCurrentLimit) {
+
+    }
 }

@@ -5,6 +5,23 @@ import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.team2813.lib.talon.BaseMotorControllerWrapper;
 
 public class TalonConfig extends MotorConfig {
+
+    private int deviceNumber;
+    private int peakCurrentDuration;
+    private int peakCurrentLimit;
+    private boolean enableVoltageCompensation;
+    private int compSaturationVoltage;
+    private int continuousCurrentLimitAmps;
+    private int motionAcceleration;
+    private int motionCruiseVelocity;
+    private double closedLoopRampRate;
+    private double openLoopRampRate;
+    private boolean invertSensorPhase;
+    private StatusFrameEnhanced statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
+    private int statusFramePeriod = 5;
+    private VelocityMeasPeriod velocityMeasurementPeriod;
+    private BaseMotorControllerWrapper.VelocityMeasurementWindow velocityMeasurementWindow;
+
     @Override
     public int getDeviceNumber() {
         return deviceNumber;
@@ -123,23 +140,15 @@ public class TalonConfig extends MotorConfig {
         return velocityMeasurementWindow;
     }
 
-    public void setVelocityMeasurementWindow(BaseMotorControllerWrapper.VelocityMeasurementWindow velocityMeasurementWindow) {
-        this.velocityMeasurementWindow = velocityMeasurementWindow;
+
+    public void getPidControllers() {
     }
 
-    private int deviceNumber;
-    private int peakCurrentDuration;
-    private int peakCurrentLimit;
-    private boolean enableVoltageCompensation;
-    private int compSaturationVoltage;
-    private int continuousCurrentLimitAmps;
-    private int motionAcceleration;
-    private int motionCruiseVelocity;
-    private double closedLoopRampRate;
-    private double openLoopRampRate;
-    private boolean invertSensorPhase;
-    private StatusFrameEnhanced statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
-    private int statusFramePeriod = 5;
-    private VelocityMeasPeriod velocityMeasurementPeriod;
-    private BaseMotorControllerWrapper.VelocityMeasurementWindow velocityMeasurementWindow;
+    public Inverted getInverted() {
+
+    }
+
+    public FollowerConfig[] getFollowers() {
+
+    }
 }
