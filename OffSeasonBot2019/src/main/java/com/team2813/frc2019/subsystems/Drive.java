@@ -77,7 +77,7 @@ public class Drive extends Subsystem {
     NetworkTableEntry camtranEntry = table.getEntry("camtran");
 
     private static final int MAX_VELOCITY = 18000; // max velocity of velocity drive in rpm
-    VelocityDrive velocityDrive = new VelocityDrive(MAX_VELOCITY, 45000);
+    VelocityDrive velocityDrive = new VelocityDrive(MAX_VELOCITY);
     CurvatureDrive curvatureDrive = new CurvatureDrive(TELEOP_DEAD_ZONE);
     ArcadeDrive arcadeDrive = curvatureDrive.getArcadeDrive();
     DriveDemand driveDemand = new DriveDemand(0, 0);
@@ -89,8 +89,8 @@ public class Drive extends Subsystem {
 
     Drive() {
         try {
-            velocityDrive.configureMotor(LEFT);
-            velocityDrive.configureMotor(RIGHT);
+            velocityDrive.configureMotor(LEFT, MotorConfigs.motorConfigs.getSparks().get("driveLeft"));
+            velocityDrive.configureMotor(RIGHT, MotorConfigs.motorConfigs.getSparks().get("driveRight"));
 
             // be sure they're inverted correctly
             LEFT.setInverted(LEFT.getConfig().getInverted());

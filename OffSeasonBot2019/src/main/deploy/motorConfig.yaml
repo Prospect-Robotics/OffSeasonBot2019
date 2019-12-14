@@ -21,12 +21,12 @@ sparks:
         inverted: FOLLOW_LEADER
     inverted: NONINVERTED
     pidControllers:
-      - p: 0
+      - p: 0.00013
         i: 0
         d: 0
         f: 0
-        maxVelocity: 0
-        maxAcceleration: 0
+        maxVelocity: 18000
+        maxAcceleration: 45000
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0
@@ -51,12 +51,12 @@ sparks:
         inverted: FOLLOW_LEADER
     inverted: INVERTED
     pidControllers:
-      - p: 0
+      - p: 0.00013
         i: 0
         d: 0
         f: 0
-        maxVelocity: 0
-        maxAcceleration: 0
+        maxVelocity: 18000
+        maxAcceleration: 45000
         maxIntegralAccumulator: 0
         integralZone: 0
         allowableClosedLoopError: 0

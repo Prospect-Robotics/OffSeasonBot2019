@@ -20,6 +20,8 @@ public class MotorConfigs {
     public static Map<String, TalonConfig> talons = new HashMap<>();
     public static Map<String, VictorWrapper> victors = new HashMap<>();
 
+    public static RootConfigs motorConfigs;
+
     private static List<Integer> ids = new ArrayList<>();
 
     public static void read() throws IOException {
@@ -27,7 +29,7 @@ public class MotorConfigs {
         File configFile = new File(deployDirectory.getAbsolutePath() + "/motorConfig.yaml");
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        RootConfigs motorConfigs = mapper.readValue(configFile, RootConfigs.class);
+        motorConfigs = mapper.readValue(configFile, RootConfigs.class);
 
         motorConfigs.getSparks().forEach(((s, sparkConfig) -> sparks.put(s, initializeSpark(sparkConfig))));
         motorConfigs.getVictors().forEach(((s, victorConfig) -> victors.put(s, initializeVictor(victorConfig))));
