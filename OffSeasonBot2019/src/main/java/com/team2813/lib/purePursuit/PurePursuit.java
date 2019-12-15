@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import static java.awt.geom.Point2D.*;
 
 public class PurePursuit {
+    public double constrain(double value, double min, double max){
+        return Math.min(Math.max(value, min), max);
+    }
     // finds coordinate location of the robot
     public Point2D getLocation(double rightEncoderVal, double leftEncoderVal) {
         double currentRightVal = 0.0;
@@ -171,11 +174,21 @@ public class PurePursuit {
     }
 
     //smooths the transition in velocity by limiting the rates
-    //TODO:incomplete
-    public double rateLimiter(double targetVelocity, double maxRateOfChange) {
-        double changeInTime = Timer.getFPGATimestamp(); //TODO: I'm not sure if this is accurate. Can someone look this over
-        double maxChange = changeInTime * maxRateOfChange;
-        return maxChange; // placeholder
+    public double[] rateLimiter(double[] targetVelocity, double maxRateOfChange) {
+        double changeInTime = 0.0;
+        double maxChange = 0.0;
+        double[] output = new double[targetVelocity.length];
+        changeInTime = Timer.getFPGATimestamp(); //TODO: I'm not sure if this is accurate. Can someone look this over
+        maxChange = changeInTime * maxRateOfChange;
+        output[0] = constrain(targetVelocity[0], -maxChange, maxChange);
+        targetVelocity[0] += output[0];
+        for(int i = 1; i < targetVelocity.length; i++){
+            changeInTime = Timer.getFPGATimestamp(); //TODO: I'm not sure if this is accurate. Can someone look this over
+            maxChange = changeInTime * maxRateOfChange;
+            output[i] = constrain(targetVelocity[i] - output[i - 1], -maxChange, maxChange);
+            targetVelocity[i] += output[i];
+        }
+        return targetVelocity;
     }
-
+    
 }
