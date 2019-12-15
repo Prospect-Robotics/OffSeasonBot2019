@@ -156,19 +156,26 @@ public class PurePursuit {
         }
         return pathVelocity;
     }
-//TODO:incomplete
-    //Part 3: calculates target robot path velocities for each point given the velocity setpoints above
+    //Part 3: calculates target robot path velocities for each point given the velocity setpoints above run through a rate limiter
     public double[] targetVelocity(double[] pathVelocity, double maxAcceleration, ArrayList<Point2D> path) {
+        double xDif;
+        double yDif;
+        double distancePoints;
         double max;
         double[] distance = distancePoints(path);
         double[] targetVelocity = new double[pathVelocity.length];
+        double[] maxVelocity = new double[pathVelocity.length];
         for (int i = 1; i > targetVelocity.length; i++) {
-            //find target velocities
+            //find maximum reachable velocities
             max = Math.sqrt(Math.pow(pathVelocity[i - 1], 2) + 2 * maxAcceleration * distance[i]);
-            targetVelocity[i] = max;
+            maxVelocity[i] = max;
         }
         targetVelocity[targetVelocity.length - 1] = 0;
-        for (int i = targetVelocity.length - 1; i > 0; i --){
+        for (int i = targetVelocity.length - 2; i > 0; i --){
+            xDif = path.get(i).getX() - path.get(i + 1).getX();
+            yDif = path.get(i).getY() - path.get(i + 1).getY();
+            distancePoints = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+            targetVelocity[i] = Math.min(pathVelocity[i], Math.sqrt(Math.pow(targetVelocity[i + 1], 2) + 2 * maxAcceleration * distancePoints));
         }
         return targetVelocity;
     }
@@ -178,17 +185,17 @@ public class PurePursuit {
         double changeInTime = 0.0;
         double maxChange = 0.0;
         double[] output = new double[targetVelocity.length];
-        changeInTime = Timer.getFPGATimestamp(); //TODO: I'm not sure if this is accurate. Can someone look this over
+        changeInTime = Timer.getFPGATimestamp();
         maxChange = changeInTime * maxRateOfChange;
         output[0] = constrain(targetVelocity[0], -maxChange, maxChange);
         targetVelocity[0] += output[0];
         for(int i = 1; i < targetVelocity.length; i++){
-            changeInTime = Timer.getFPGATimestamp(); //TODO: I'm not sure if this is accurate. Can someone look this over
+            changeInTime = Timer.getFPGATimestamp();
             maxChange = changeInTime * maxRateOfChange;
             output[i] = constrain(targetVelocity[i] - output[i - 1], -maxChange, maxChange);
             targetVelocity[i] += output[i];
         }
         return targetVelocity;
     }
-    
+
 }
