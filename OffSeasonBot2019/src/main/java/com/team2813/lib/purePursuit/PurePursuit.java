@@ -44,7 +44,8 @@ public class PurePursuit {
                 unitVector.setLocation(xDif / vectorMagnitude * spacing, yDif / vectorMagnitude * spacing);
                 Point2D newPoint = new Point2D.Double();
                 for (int j = 0; j < numPoints; j++) {
-                    newPoint.setLocation(startPosition.getX() + unitVector.getX() * j, startPosition.getY() + unitVector.getY() * j);
+                    newPoint.setLocation(startPosition.getX() + unitVector.getX() * j, startPosition.getY() +
+                            unitVector.getY() * j);
                     path.add(i + j + 1, newPoint);
                 }
                 i += numPoints;
@@ -73,14 +74,16 @@ public class PurePursuit {
                         x = path.get(i).getX();
                         double aux = newPath.get(i).getX();
                         newX = newPath.get(i).getX();
-                        newX += a * (x - aux) + b * (newPath.get(i - 1).getX() + newPath.get(i + 1).getX()) - (2.0 * aux);
+                        newX += a * (x - aux) + b * (newPath.get(i - 1).getX() + newPath.get(i + 1).getX()) -
+                                (2.0 * aux);
                         change += Math.abs(aux - newX);
                     }
                     if (j == 1) {
                         y = path.get(i).getY();
                         double aux = newPath.get(i).getY();
                         newY = newPath.get(i).getY();
-                        newY += a * (y - aux) + b * (newPath.get(i - 1).getY() + newPath.get(i + 1).getY()) - (2.0 * aux);
+                        newY += a * (y - aux) + b * (newPath.get(i - 1).getY() + newPath.get(i + 1).getY()) -
+                                (2.0 * aux);
                         change += Math.abs(aux - newY);
                     }
                 }
@@ -116,8 +119,8 @@ public class PurePursuit {
         double y3 = R.getY();
         double k1 = 0.5 * (((x1 * x1) + (y1 * y1)) - ((x2 * x2) + (y2 * y2))) / (x1 - x2);
         double k2 = (y1 - y2) / (x1 - x2);
-        double b = 0.5 * ((x2 * x2) - (2 * x2 * k1) + (y2 * y2) - (x3 * x3) + (2 * x3 * k1) - (y3 * y3)) / (x3 * k2 - y3 +
-                y2 - x2 * k2);
+        double b = 0.5 * ((x2 * x2) - (2 * x2 * k1) + (y2 * y2) - (x3 * x3) + (2 * x3 * k1) -
+                (y3 * y3)) / (x3 * k2 - y3 + y2 - x2 * k2);
         double a = k1 - k2 * b;
         double r = Math.sqrt(((x1 - a) * (x1 - a)) + ((y1 - b) * (y1 - b)));
         double curvature = 1 / r;
@@ -175,7 +178,8 @@ public class PurePursuit {
             xDif = path.get(i).getX() - path.get(i + 1).getX();
             yDif = path.get(i).getY() - path.get(i + 1).getY();
             distancePoints = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
-            targetVelocity[i] = Math.min(pathVelocity[i], Math.sqrt(Math.pow(targetVelocity[i + 1], 2) + 2 * maxAcceleration * distancePoints));
+            targetVelocity[i] = Math.min(pathVelocity[i], Math.sqrt(Math.pow(targetVelocity[i + 1], 2) +
+                    2 * maxAcceleration * distancePoints));
         }
         return targetVelocity;
     }
@@ -197,5 +201,19 @@ public class PurePursuit {
         }
         return targetVelocity;
     }
-
+    public Point2D closestPoint(ArrayList<Point2D> path, int indexLastPoint, double rightEncoderVal,
+                                double leftEncoderVal){
+        ArrayList<Point2D> searchPath = new ArrayList<Point2D>();
+        for(int i = indexLastPoint + 1; i < path.size(); i++){
+            searchPath.add(path.get(i));
+        }
+        Point2D location = new Point2D.Double();
+        location = getLocation(rightEncoderVal, leftEncoderVal);
+        int xDif;
+        int yDif;
+        double[] distance = new double[searchPath.size()];
+        for(int i = 0; i < searchPath.size(); i++){
+            
+        }
+    }
 }
