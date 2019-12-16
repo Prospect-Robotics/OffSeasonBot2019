@@ -203,17 +203,28 @@ public class PurePursuit {
     }
     public Point2D closestPoint(ArrayList<Point2D> path, int indexLastPoint, double rightEncoderVal,
                                 double leftEncoderVal){
+        Point2D closestPoint = new Point2D.Double();
         ArrayList<Point2D> searchPath = new ArrayList<Point2D>();
         for(int i = indexLastPoint + 1; i < path.size(); i++){
             searchPath.add(path.get(i));
         }
         Point2D location = new Point2D.Double();
         location = getLocation(rightEncoderVal, leftEncoderVal);
-        int xDif;
-        int yDif;
+        double xDif;
+        double yDif;
         double[] distance = new double[searchPath.size()];
         for(int i = 0; i < searchPath.size(); i++){
-            
+            xDif = location.getX() - searchPath.get(i).getX();
+            yDif = location.getY() - searchPath.get(i).getY();
+            distance[i] = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
         }
+        int index = 0;
+        for(int i = 0; i < distance.length; i++){
+            if(distance[index] > distance[i]){
+                index = i;
+            }
+        }
+        closestPoint = searchPath.get(index);
+        return closestPoint;
     }
 }
