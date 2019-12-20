@@ -48,8 +48,8 @@ public class Drive extends Subsystem {
     // Motor Controllers
     private static final CANSparkMaxWrapper LEFT = MotorConfigs.sparks.get("driveLeft");
     private static final CANSparkMaxWrapper RIGHT = MotorConfigs.sparks.get("driveRight");
-    private double right_demand;
-    private double left_demand;
+//    private double right_demand;
+//    private double left_demand;
     private boolean isBrakeMode;
 
     // Encoders
@@ -97,13 +97,14 @@ public class Drive extends Subsystem {
     VelocityDrive velocityDrive = new VelocityDrive(MAX_VELOCITY);
     CurvatureDrive curvatureDrive = new CurvatureDrive(TELEOP_DEAD_ZONE);
     ArcadeDrive arcadeDrive = curvatureDrive.getArcadeDrive();
+
     DriveDemand driveDemand = new DriveDemand(0, 0);
 
     public DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(48));
     public DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), new Pose2d(0, 0, getHeading()));
 
     private NetworkTableEntry velocityEntry = Shuffleboard.getTab("Tuning")
-            .addPersistent("Bruh", 0).getEntry();
+            .addPersistent("Velocity Control", 0).getEntry();
     private boolean velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
     private boolean velocityFailed = false;
 
@@ -126,47 +127,15 @@ public class Drive extends Subsystem {
         velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
         odometry.update(getHeading(), Units.inchesToMeters(LEFT.getEncoderPosition() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE), Units.inchesToMeters(RIGHT.getEncoderPosition() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE));
 
-        if (AUTO_BUTTON.get()) {
+        if (velocityEnabled) driveMode = DriveMode.SMART_VELOCITY;
 
+        if (AUTO_BUTTON.get()) {
         } else if (driveType == TeleopDriveType.ARCADE) {
             driveDemand = arcadeDrive.getDemand(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
         } else if (driveType == TeleopDriveType.CURVATURE) {
             driveDemand = curvatureDrive.getDemand(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());
         }
-    }
 
-    private void curvatureDrive(double throttleForward, double throttleBackward, double steerX, boolean pivot) {
-//		double throttle = Math.pow(throttleForward, 2) - Math.pow(throttleBackward, 2);
-        double throttle = 2 * Math.asin(throttleForward - throttleBackward) / Math.PI;
-        double steer = 2 * Math.asin(steerX) / Math.PI;
-
-        steer = -steer;
-        arcadeDrive(pivot ? steer * .4 : throttle * steer, throttle);
-    }
-
-    private void arcadeDrive(double x, double y) {
-        double maxPercent = 1.0;
-        double throttleLeft = 0;
-        double throttleRight = 0;
-
-        double steer = 0;
-
-        if (Math.abs(y) > TELEOP_DEAD_ZONE) { // dead zone
-            throttleLeft = maxPercent * y;
-            throttleRight = maxPercent * y;
-        }
-
-        if (Math.abs(x) > TELEOP_DEAD_ZONE) {
-            double xMax = 0.4;
-            steer = 1.0 * x;
-        }
-//
-//        System.out.println(throttleLeft + " " + throttleRight);
-
-//        System.out.println((throttleLeft - steer) + " " + (throttleLeft + steer));
-
-        left_demand = throttleLeft + steer;
-        right_demand = throttleRight - steer;
     }
 
     public Rotation2d getHeading() {
@@ -182,8 +151,8 @@ public class Drive extends Subsystem {
         // If turning right, left moves forward and right moves backward
         // If turning left, right moves forward and left moves backward
         // TODO: 10/05/2019 I'm not sure this is right. I think there might be a better way to do it using trig.
-        left_demand = MIN_AUTO_POS_CHANGE + LEFT.getEncoderPosition() + (angle * ENCODER_TICKS_PER_DEGREE_TANK_TURN);
-        right_demand = MIN_AUTO_POS_CHANGE + RIGHT.getEncoderPosition() - (angle * ENCODER_TICKS_PER_DEGREE_TANK_TURN);
+//        left_demand = MIN_AUTO_POS_CHANGE + LEFT.getEncoderPosition() + (angle * ENCODER_TICKS_PER_DEGREE_TANK_TURN);
+//        right_demand = MIN_AUTO_POS_CHANGE + RIGHT.getEncoderPosition() - (angle * ENCODER_TICKS_PER_DEGREE_TANK_TURN);
     }
 
     @Override
@@ -224,15 +193,8 @@ public class Drive extends Subsystem {
     }
 
     protected synchronized void writePeriodicOutputs_() throws SparkMaxException {
-        if (!velocityFailed && velocityEnabled) {
-            double leftVelocity = velocityDrive.getVelocityFromDemand(driveDemand.getLeft());
-            double rightVelocity = velocityDrive.getVelocityFromDemand(driveDemand.getRight());
-            LEFT.set(leftVelocity, ControlType.kSmartVelocity);
-            RIGHT.set(rightVelocity, ControlType.kSmartVelocity);
-        } else {
-            LEFT.set(driveDemand.getLeft(), driveMode.controlType);
-            RIGHT.set(driveDemand.getRight(), driveMode.controlType);
-        }
+        LEFT.set(driveDemand.getLeft(), driveMode.controlType);
+        RIGHT.set(driveDemand.getRight(), driveMode.controlType);
     }
 
     public synchronized void setBrakeMode(boolean brake) {
@@ -251,7 +213,7 @@ public class Drive extends Subsystem {
     private enum DriveMode {
         OPEN_LOOP(ControlType.kDutyCycle),
         SMART_MOTION(ControlType.kSmartMotion),
-        VELOCITY(ControlType.kVelocity);
+        SMART_VELOCITY(ControlType.kSmartVelocity);
 
         ControlType controlType;
 
