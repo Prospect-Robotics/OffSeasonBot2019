@@ -227,4 +227,35 @@ public class PurePursuit {
         closestPoint = searchPath.get(index);
         return closestPoint;
     }
+    public Point2D lookAheadPoint(Point2D e, Point2D l, Point2D c, double r){
+        double t = Timer.getFPGATimestamp();
+        Point2D d = new Point2D.Double();
+        Point2D f = new Point2D.Double();
+        Point2D intersection = new Point2D.Double();
+        d.setLocation(l.getX() - e.getX(), l.getY() - e.getY());
+        f.setLocation(e.getX() - c.getX(), e.getY() - c.getY());
+        double a = Math.pow(d.getX(), 2) + Math.pow(d.getY(), 2);
+        double b = 2 * ((f.getX() * d.getX()) + (f.getY() * d.getY()));
+        double dc = Math.pow(f.getX(), 2) + Math.pow(f.getY(), 2) - Math.pow(r, 2);
+        double discriminant = Math.pow(b, 2) - (4 * a * dc);
+        if(discriminant < 0){
+            return intersection;
+        }
+        else{
+            discriminant = Math.sqrt(discriminant);
+            double t1 = (-b - discriminant) / (2 * a);
+            double t2 = (-b + discriminant) / (2 * a);
+            if(t1 >= 0 && t1 <= 1){
+                intersection.setLocation(e.getX() + t1 * d.getX(), e.getY() + t1 * d.getX());
+                return intersection;
+            }
+            else if(t2 >= 0 && t2 <= 1){
+                intersection.setLocation(e.getX() + t2 * d.getX(), e.getY() + t2 * d.getX());
+                return intersection;
+            }
+            else{
+                return intersection;
+            }
+        }
+    }
 }
