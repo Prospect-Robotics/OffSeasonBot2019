@@ -201,9 +201,9 @@ public class PurePursuit {
         }
         return targetVelocity;
     }
-    public Point2D closestPoint(ArrayList<Point2D> path, int indexLastPoint, double rightEncoderVal,
+    //returns index of the closest point to the robot
+    public int closestPoint(ArrayList<Point2D> path, int indexLastPoint, double rightEncoderVal,
                                 double leftEncoderVal){
-        Point2D closestPoint = new Point2D.Double();
         ArrayList<Point2D> searchPath = new ArrayList<Point2D>();
         for(int i = indexLastPoint + 1; i < path.size(); i++){
             searchPath.add(path.get(i));
@@ -224,8 +224,7 @@ public class PurePursuit {
                 index = i;
             }
         }
-        closestPoint = searchPath.get(index);
-        return closestPoint;
+        return index;
     }
     //finds look ahead point
     public Point2D lookAheadPoint(Point2D e, Point2D l, Point2D c, double r){
@@ -277,4 +276,22 @@ public class PurePursuit {
         curvature *= side;
         return curvature;
     }
+    //finds wheel velocities
+    public double[] wheelVelocities(double c, ArrayList<Point2D> path, int closestPointIndex, double t,
+                                    double maxVelocity, double minVelocity, double k, double maxRateOfChange,
+                                    double maxAcceleration){
+        double targetVelocities[] = new double[path.size()];
+        targetVelocities = pathVelocity(findPathCurvature(path), maxVelocity, minVelocity, k);
+        targetVelocities = rateLimiter(targetVelocities, maxRateOfChange);
+        targetVelocities = targetVelocity(targetVelocities, maxAcceleration, path);
+        double targetVelocity = targetVelocities[closestPointIndex];
+        double r = 1/c;
+        double[] wheelVelocity = new double[2];
+        double l = targetVelocity * (2 + (c * t))/2;
+        double wvr = targetVelocity * (2 - (c * t))/2;
+        wheelVelocity[0] = l;
+        wheelVelocity[1] = wvr;
+        return wheelVelocity;
+    }
+    
 }
