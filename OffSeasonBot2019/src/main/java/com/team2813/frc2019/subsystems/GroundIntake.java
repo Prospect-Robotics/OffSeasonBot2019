@@ -56,7 +56,8 @@ public class GroundIntake extends Subsystem {
     }
 
     @Override
-    protected void writePeriodicOutputs_() throws SparkMaxException {
+    protected void writePeriodicOutputs_() throws SparkMaxException, CTREException {
+	    ROLLER.set(ControlMode.PercentOutput, -1.0);// TODO: 12/13/2019 remove for testing prototype shooter only
 	    if (targetPosition == Position.RETRACTED && MainIntake.currentPosition == MainIntake.Position.PICKUP_CARGO) {
 	        targetPosition = Position.EXTENDED;
         }
