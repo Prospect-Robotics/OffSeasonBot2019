@@ -227,6 +227,7 @@ public class PurePursuit {
         closestPoint = searchPath.get(index);
         return closestPoint;
     }
+    //finds look ahead point
     public Point2D lookAheadPoint(Point2D e, Point2D l, Point2D c, double r){
         double t = Timer.getFPGATimestamp();
         Point2D d = new Point2D.Double();
@@ -243,8 +244,8 @@ public class PurePursuit {
         }
         else{
             discriminant = Math.sqrt(discriminant);
-            double t1 = (-b - discriminant) / (2 * a);
-            double t2 = (-b + discriminant) / (2 * a);
+            double t1 = (-b - discriminant)/(2 * a);
+            double t2 = (-b + discriminant)/(2 * a);
             if(t1 >= 0 && t1 <= 1){
                 intersection.setLocation(e.getX() + t1 * d.getX(), e.getY() + t1 * d.getX());
                 return intersection;
@@ -257,5 +258,23 @@ public class PurePursuit {
                 return intersection;
             }
         }
+    }
+    //finds curvature of arc to look ahead point
+    public double lookAheadCurvature(Point2D lookAheadPoint, double l, double r, double rightEncoderVal,
+                                     double leftEncoderVal){
+        double curvature = (2 * lookAheadPoint.getX())/Math.pow(l, 2);
+        double robotAngle;
+        Point2D robotLocation = new Point2D.Double();
+        robotLocation = getLocation(rightEncoderVal, leftEncoderVal);
+        robotAngle = Math.atan((lookAheadPoint.getY() - robotLocation.getY())/(lookAheadPoint.getX() -
+                robotLocation.getX()));
+        double a = -Math.tan(robotAngle);
+        double c = Math.tan(robotAngle) * robotLocation.getX() - robotLocation.getY();
+        double d = Math.abs((a * lookAheadPoint.getX()) + lookAheadPoint.getY() + c)/
+                Math.sqrt(Math.pow(a, 2) + 1);
+        double side = Math.signum(Math.sin(robotAngle) * (lookAheadPoint.getX() - robotLocation.getX()) -
+                Math.cos(robotAngle) * (lookAheadPoint.getY() - robotLocation.getY()));
+        curvature *= side;
+        return curvature;
     }
 }
