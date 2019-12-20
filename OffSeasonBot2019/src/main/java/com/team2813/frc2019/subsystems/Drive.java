@@ -1,5 +1,6 @@
 package com.team2813.frc2019.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
 import com.team2813.lib.config.MotorConfigs;
@@ -15,7 +16,20 @@ import com.team2813.lib.talon.CTREException;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.util.Units;
+
+import static com.team2813.frc2019.Robot.gyro;
 
 /**
  * The Drive subsystem is the main subsystem for
@@ -54,6 +68,9 @@ public class Drive extends Subsystem {
     private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
     private static final Button AUTO_BUTTON = SubsystemControlsConfig.autoButton;
 
+    private static final double GEAR_REDUCTION = 9.0 / 60;
+    private static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
+
     // Mode
     private static DriveMode driveMode = DriveMode.OPEN_LOOP;
 
@@ -82,6 +99,9 @@ public class Drive extends Subsystem {
     ArcadeDrive arcadeDrive = curvatureDrive.getArcadeDrive();
     DriveDemand driveDemand = new DriveDemand(0, 0);
 
+    public DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(48));
+    public DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), new Pose2d(0, 0, getHeading()));
+
     private NetworkTableEntry velocityEntry = Shuffleboard.getTab("Tuning")
             .addPersistent("Bruh", 0).getEntry();
     private boolean velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
@@ -95,6 +115,7 @@ public class Drive extends Subsystem {
             // be sure they're inverted correctly
             LEFT.setInverted(LEFT.getConfig().getInverted());
             RIGHT.setInverted(RIGHT.getConfig().getInverted());
+
         } catch (SparkMaxException e) {
             velocityFailed = true;
             e.printStackTrace();
@@ -103,32 +124,10 @@ public class Drive extends Subsystem {
 
     private void teleopDrive(TeleopDriveType driveType) {
         velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
-//        if (!(CURVATURE_FORWARD.get() > 0 && CURVATURE_REVERSE.get() > 0)) {
-//            velocityDrive.setAccelerating(false);
-//        } else {
-//            velocityDrive.setAccelerating(true);
-//        }
+        odometry.update(getHeading(), Units.inchesToMeters(LEFT.getEncoderPosition() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE), Units.inchesToMeters(RIGHT.getEncoderPosition() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE));
 
-        // PATH CORRECTION
-        double[] camtran = camtranEntry.getDoubleArray(new double[]{0, 0, 0, 0, 0, 0});
-        double x = camtran[0];
-        double y = camtran[1];
-        double pitch = camtran[4];
+        if (AUTO_BUTTON.get()) {
 
-        double correctionSteer = 0;
-        double difference = pitch - Math.atan(y / (x - 10.5));
-        if (Math.abs(difference) > 0.5) {
-            double rawSteer = difference / 27;
-            correctionSteer = CORRECTION_MAX_STEER_SPEED * (Math.pow(rawSteer, 2) * (Math.abs(rawSteer) / rawSteer));
-        }
-
-        if (PIVOT_BUTTON.get()) {
-
-        }
-
-        if (AUTO_BUTTON.get() && Subsystems.MAIN_INTAKE.periodicIO.demand != MainIntake.Position.FRONT_HATCH.getPos() && Subsystems.MAIN_INTAKE.periodicIO.demand != MainIntake.Position.REAR_HATCH.getPos()) {
-            System.out.println("Correction Steer " + correctionSteer);
-            driveDemand = curvatureDrive.getDemand(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), correctionSteer, true);
         } else if (driveType == TeleopDriveType.ARCADE) {
             driveDemand = arcadeDrive.getDemand(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
         } else if (driveType == TeleopDriveType.CURVATURE) {
@@ -138,8 +137,7 @@ public class Drive extends Subsystem {
 
     private void curvatureDrive(double throttleForward, double throttleBackward, double steerX, boolean pivot) {
 //		double throttle = Math.pow(throttleForward, 2) - Math.pow(throttleBackward, 2);
-        double throttle =  2 * Math.asin(throttleForward - throttleBackward) / Math.PI;
-//        double steer = Math.sin((Math.PI / 2) * steerX );
+        double throttle = 2 * Math.asin(throttleForward - throttleBackward) / Math.PI;
         double steer = 2 * Math.asin(steerX) / Math.PI;
 
         steer = -steer;
@@ -171,6 +169,15 @@ public class Drive extends Subsystem {
         right_demand = throttleRight - steer;
     }
 
+    public Rotation2d getHeading() {
+        return Rotation2d.fromDegrees(gyro.getAngle());
+    }
+
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        return new DifferentialDriveWheelSpeeds(Units.inchesToMeters(LEFT.getEncoder().getVelocity()) * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE,
+                Units.inchesToMeters(RIGHT.getEncoder().getVelocity() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE));
+    }
+
     private void autoDrive(double angle) {
         // If turning right, left moves forward and right moves backward
         // If turning left, right moves forward and left moves backward
@@ -186,7 +193,7 @@ public class Drive extends Subsystem {
 
     @Override
     protected void outputTelemetry_() throws CTREException {
-
+        SmartDashboard.putString("pose", odometry.getPoseMeters().toString());
     }
 
     @Override

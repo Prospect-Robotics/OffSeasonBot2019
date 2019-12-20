@@ -9,7 +9,7 @@ import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.VictorWrapper;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 
 public class GroundIntake extends Subsystem {
 
