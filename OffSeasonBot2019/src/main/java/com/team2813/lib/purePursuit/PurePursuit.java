@@ -293,5 +293,9 @@ public class PurePursuit {
         wheelVelocity[1] = wvr;
         return wheelVelocity;
     }
-    
+    //finds wheel power for the left/right wheels
+    public double[] wheelPower(double[] wheelVelocities, double kv, double ka, double kp){
+        double ff;
+        double fb;
+    }
 }
