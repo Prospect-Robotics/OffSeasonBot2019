@@ -45,14 +45,15 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		try {
 			CrashTracker.logRobotInit();
-			MotorConfigs.read();
-			gyro.calibrate();
-			gyro.reset();
-			Subsystems.initializeSubsystems();
-			for (Subsystem subsystem : allSubsystems) {
-				LOOPER.addLoop(subsystem);
-				subsystem.zeroSensors();
-			}
+			MotorConfigs.read(() -> {
+				gyro.calibrate();
+				gyro.reset();
+				Subsystems.initializeSubsystems();
+				for (Subsystem subsystem : allSubsystems) {
+					LOOPER.addLoop(subsystem);
+					subsystem.zeroSensors();
+				}
+			});
 		} catch (IOException e) {
 			System.out.println("ERROR WHEN READING CONFIG");
 			e.printStackTrace();

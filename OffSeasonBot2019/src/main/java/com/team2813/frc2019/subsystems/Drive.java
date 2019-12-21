@@ -3,6 +3,7 @@ package com.team2813.frc2019.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
+import com.team2813.lib.auto.RamseteAuto;
 import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
@@ -23,11 +24,14 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.util.Units;
+
+import java.util.List;
 
 import static com.team2813.frc2019.Robot.gyro;
 
@@ -42,8 +46,9 @@ import static com.team2813.frc2019.Robot.gyro;
 public class Drive extends Subsystem {
 
     // Physical Constants
-    private static final double WHEEL_DIAMETER_INCHES = 1.0; // TODO: 10/05/2019 correct number
-    private static final double WHEEL_CIRCUMFERENCE_INCHES = Math.PI * WHEEL_DIAMETER_INCHES;
+    private static final double GEAR_REDUCTION = 9.0 / 60;
+    private static final double WHEEL_DIAMETER = 3.96; // TODO: 10/05/2019 correct number
+    private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 
     // Motor Controllers
     private static final CANSparkMaxWrapper LEFT = MotorConfigs.sparks.get("driveLeft");
@@ -54,7 +59,7 @@ public class Drive extends Subsystem {
 
     // Encoders
     private static final double ENCODER_TICKS_PER_REVOLUTION = 0.0; // TODO: 10/05/2019 replace with correct value
-    private static final double ENCODER_TICKS_PER_INCH = ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE_INCHES;
+    private static final double ENCODER_TICKS_PER_INCH = ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE;
     private static final double ENCODER_TICKS_PER_FOOT = ENCODER_TICKS_PER_INCH / 12;
 
     // Controls
@@ -67,9 +72,6 @@ public class Drive extends Subsystem {
     private static final Button PIVOT_BUTTON = SubsystemControlsConfig.pivotButton;
     private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
     private static final Button AUTO_BUTTON = SubsystemControlsConfig.autoButton;
-
-    private static final double GEAR_REDUCTION = 9.0 / 60;
-    private static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
 
     // Mode
     private static DriveMode driveMode = DriveMode.OPEN_LOOP;
@@ -99,8 +101,10 @@ public class Drive extends Subsystem {
     ArcadeDrive arcadeDrive = curvatureDrive.getArcadeDrive();
     DriveDemand driveDemand = new DriveDemand(0, 0);
 
-    public DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(48));
-    public DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), new Pose2d(0, 0, getHeading()));
+    // Autonomous
+    private DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(48));
+    private DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), new Pose2d(0, 0, getHeading()));
+    private RamseteAuto auto;
 
     private NetworkTableEntry velocityEntry = Shuffleboard.getTab("Tuning")
             .addPersistent("Bruh", 0).getEntry();
@@ -112,10 +116,24 @@ public class Drive extends Subsystem {
             velocityDrive.configureMotor(LEFT, MotorConfigs.motorConfigs.getSparks().get("driveLeft"));
             velocityDrive.configureMotor(RIGHT, MotorConfigs.motorConfigs.getSparks().get("driveRight"));
 
+            LEFT.zero();
+            RIGHT.zero();
+
             // be sure they're inverted correctly
             LEFT.setInverted(LEFT.getConfig().getInverted());
             RIGHT.setInverted(RIGHT.getConfig().getInverted());
 
+            DriveDemand.circumference = WHEEL_CIRCUMFERENCE;
+
+            // testing ramsete
+//            auto = new RamseteAuto(kinematics,
+//                    new Pose2d(0, 0, new Rotation2d(0)),
+//                    List.of(new Translation2d(2, 0)),
+//                    new Pose2d(2, 0, new Rotation2d(0)));
+            auto = new RamseteAuto(kinematics,
+                    new Pose2d(0, 0, new Rotation2d(0)),
+                    List.of(new Translation2d(2, 0)),
+                    new Pose2d(4, 4, Rotation2d.fromDegrees(90)));
         } catch (SparkMaxException e) {
             velocityFailed = true;
             e.printStackTrace();
@@ -127,10 +145,14 @@ public class Drive extends Subsystem {
         odometry.update(getHeading(), Units.inchesToMeters(LEFT.getEncoderPosition() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE), Units.inchesToMeters(RIGHT.getEncoderPosition() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE));
 
         if (AUTO_BUTTON.get()) {
-
+            if (auto != null) {
+                driveDemand = auto.getDemand(odometry.getPoseMeters());
+            }
         } else if (driveType == TeleopDriveType.ARCADE) {
+            if (auto != null) auto.reset();
             driveDemand = arcadeDrive.getDemand(ARCADE_Y_AXIS.get(), ARCADE_X_AXIS.get());
         } else if (driveType == TeleopDriveType.CURVATURE) {
+            if (auto != null) auto.reset();
             driveDemand = curvatureDrive.getDemand(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());
         }
     }
@@ -194,6 +216,8 @@ public class Drive extends Subsystem {
     @Override
     protected void outputTelemetry_() throws CTREException {
         SmartDashboard.putString("pose", odometry.getPoseMeters().toString());
+        SmartDashboard.putNumber("Left Pos", LEFT.getEncoderPosition());
+        SmartDashboard.putNumber("Right Pos", RIGHT.getEncoderPosition());
     }
 
     @Override
