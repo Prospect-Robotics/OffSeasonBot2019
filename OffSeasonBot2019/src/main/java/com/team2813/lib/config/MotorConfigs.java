@@ -50,7 +50,7 @@ public class MotorConfigs {
         System.out.println("Configuring " + config.getSubsystemName());
 
         CANSparkMaxWrapper spark = new CANSparkMaxWrapper(config.getDeviceNumber(), config.getSubsystemName(), config.getType().getValue());
-        spark.setCANTimeout(1000);
+        spark.setCANTimeout(5000);
 
         try {
             spark.factoryDefault();

@@ -12,16 +12,17 @@ import edu.wpi.first.wpilibj2.trajectory.TrajectoryGenerator;
 
 import java.util.List;
 
-public class RamseteAuto {
+public class RamseteAutoNew {
     private DifferentialDriveKinematics kinematics;
     private TrajectoryConfig config;
     private Trajectory trajectory;
     private RamseteController controller;
-    private RamseteAuto next;
+    private RamseteAutoNew next;
+    private NextConfig nextConfig;
 
     private double timeStart = -1;
 
-    public RamseteAuto(DifferentialDriveKinematics kinematics, Pose2d startVector, List<Translation2d> translations, Pose2d endVector, boolean reversed) {
+    public RamseteAutoNew(DifferentialDriveKinematics kinematics, Pose2d startVector, List<Translation2d> translations, Pose2d endVector, boolean reversed) {
         this.kinematics = kinematics;
         config = new TrajectoryConfig(2, 2)
                 .setReversed(reversed);
@@ -29,32 +30,37 @@ public class RamseteAuto {
         controller = new RamseteController();
     }
 
-    public RamseteAuto(DifferentialDriveKinematics kinematics, Pose2d startVector, List<Translation2d> translations, Pose2d endVector) {
+    public RamseteAutoNew(DifferentialDriveKinematics kinematics, Pose2d startVector, List<Translation2d> translations, Pose2d endVector) {
         this(kinematics, startVector, translations, endVector, false);
     }
 
-    public void next(RamseteAuto ramseteAuto) {
-        if (next == null) next = ramseteAuto;
-        else next.next(ramseteAuto);
+    public void next(List<Translation2d> translations, Pose2d endVector, boolean reversed) {
+        if (nextConfig == null)
+            nextConfig = new NextConfig(translations, endVector, reversed);
+        else
+            nextConfig.setNext(new NextConfig(translations, endVector, reversed));
     }
 
+    public void next(List<Translation2d> translations, Pose2d endVector) {
+        next(translations, endVector, false);
+    }
 
     public DriveDemand getDemand(Pose2d currentRobotPose) {
         if (timeStart == -1) {
             timeStart = System.currentTimeMillis();
         }
-        double tDelta = (System.currentTimeMillis() - timeStart) / 1000;
 
-        if (tDelta >= trajectory.getTotalTimeSeconds() && next != null) {
+
+        if ((System.currentTimeMillis() - timeStart) / 1000 >= trajectory.getTotalTimeSeconds() && nextConfig != null) {
+            if (next == null) {
+                System.out.println(currentRobotPose);
+                next = new RamseteAutoNew(kinematics, currentRobotPose, nextConfig.translations, nextConfig.endVector, nextConfig.reversed);
+            }
             return next.getDemand(currentRobotPose);
         }
-        Trajectory.State goal = trajectory.sample(tDelta); // sample the trajectory
+        Trajectory.State goal = trajectory.sample((System.currentTimeMillis() - timeStart) / 1000); // sample the trajectory
         ChassisSpeeds adjustedSpeeds = controller.calculate(currentRobotPose, goal);
         return new DriveDemand(kinematics.toWheelSpeeds(adjustedSpeeds));
-    }
-
-    public double getTimeDelta() {
-        return (System.currentTimeMillis() - timeStart) / 1000;
     }
 
     public void reset() {

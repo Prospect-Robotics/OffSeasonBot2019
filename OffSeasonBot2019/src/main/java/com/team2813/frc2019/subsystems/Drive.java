@@ -47,7 +47,7 @@ public class Drive extends Subsystem {
 
     // Physical Constants
     private static final double GEAR_REDUCTION = 9.0 / 60;
-    private static final double WHEEL_DIAMETER = 3.96; // TODO: 10/05/2019 correct number
+    private static final double WHEEL_DIAMETER = 4; // TODO: 10/05/2019 correct number
     private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 
     // Motor Controllers
@@ -131,9 +131,19 @@ public class Drive extends Subsystem {
 //                    List.of(new Translation2d(2, 0)),
 //                    new Pose2d(2, 0, new Rotation2d(0)));
             auto = new RamseteAuto(kinematics,
-                    new Pose2d(0, 0, new Rotation2d(0)),
-                    List.of(new Translation2d(2, 0)),
-                    new Pose2d(4, 4, Rotation2d.fromDegrees(90)));
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+                    List.of(new Translation2d(2, 0),
+                            new Translation2d(2, -1.7)),
+                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)));
+            auto.next(new RamseteAuto(kinematics,
+                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)),
+                    List.of(new Translation2d(2, -1)),
+                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
+
+//            auto = new RamseteAuto(kinematics,
+//                    new Pose2d(4, 4, Rotation2d.fromDegrees(90)),
+//                    List.of(new Translation2d(2, 2)),
+//                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)), true);
         } catch (SparkMaxException e) {
             velocityFailed = true;
             e.printStackTrace();
@@ -196,7 +206,7 @@ public class Drive extends Subsystem {
     }
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        return new DifferentialDriveWheelSpeeds(Units.inchesToMeters(LEFT.getEncoder().getVelocity()) * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE,
+        return new DifferentialDriveWheelSpeeds(Units.inchesToMeters(LEFT.getEncoder().getVelocity() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE),
                 Units.inchesToMeters(RIGHT.getEncoder().getVelocity() * GEAR_REDUCTION * WHEEL_CIRCUMFERENCE));
     }
 
@@ -215,9 +225,10 @@ public class Drive extends Subsystem {
 
     @Override
     protected void outputTelemetry_() throws CTREException {
-        SmartDashboard.putString("pose", odometry.getPoseMeters().toString());
+        SmartDashboard.putString("Pose", odometry.getPoseMeters().toString());
         SmartDashboard.putNumber("Left Pos", LEFT.getEncoderPosition());
         SmartDashboard.putNumber("Right Pos", RIGHT.getEncoderPosition());
+        SmartDashboard.putNumber("Autonomous ΔT", auto.getTimeDelta());
     }
 
     @Override
