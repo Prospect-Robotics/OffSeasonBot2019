@@ -3,11 +3,9 @@ package com.team2813.lib.sparkMax;
 import com.revrobotics.*;
 import com.team2813.lib.config.Inverted;
 import com.team2813.lib.config.SparkConfig;
-import com.team2813.lib.sparkMax.options.InvertType;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
-import edu.wpi.first.wpilibj.Spark;
 
 public class CANSparkMaxWrapper extends CANSparkMax {
 
@@ -41,6 +39,13 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region Error
 
+	/**
+	 * Same as throwIfNotOk in {@link SparkMaxException} but uses Spark's
+	 * subsystem name
+	 *
+	 * @param error
+	 * @throws SparkMaxException
+	 */
 	protected void throwIfNotOk(CANError error) throws SparkMaxException {
 		SparkMaxException.throwIfNotOk(subsystemName, error);
 	}
@@ -80,14 +85,75 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region Smart Current Limit
 
+	/**
+	 * Sets the current limit in Amps.
+	 *
+	 * The motor controller will reduce the controller voltage output to avoid
+	 * surpassing this limit. This limit is enabled by default and used for
+	 * brushless only. This limit is highly recommended when using the NEO brushless
+	 * motor.
+	 *
+	 * The NEO Brushless Motor has a low internal resistance, which can mean large
+	 * current spikes that could be enough to cause damage to the motor and
+	 * controller. This current limit provides a smarter strategy to deal with high
+	 * current draws and keep the motor and controller operating in a safe region.
+	 *
+	 * @param limit The current limit in Amps.
+	 *
+	 */
 	public void setCurrLimit(int limit) throws SparkMaxException {
 		throwIfNotOk(setSmartCurrentLimit(limit));
 	}
 
+	/**
+	 * Sets the current limit in Amps.
+	 *
+	 * The motor controller will reduce the controller voltage output to avoid
+	 * surpassing this limit. This limit is enabled by default and used for
+	 * brushless only. This limit is highly recommended when using the NEO brushless
+	 * motor.
+	 *
+	 * The NEO Brushless Motor has a low internal resistance, which can mean large
+	 * current spikes that could be enough to cause damage to the motor and
+	 * controller. This current limit provides a smarter strategy to deal with high
+	 * current draws and keep the motor and controller operating in a safe region.
+	 *
+	 * The controller can also limit the current based on the RPM of the motor in a
+	 * linear fashion to help with controllability in closed loop control. For a
+	 * response that is linear the entire RPM range leave limit RPM at 0.
+	 *
+	 * @param stallLimit The current limit in Amps at 0 RPM.
+	 * @param freeLimit  The current limit at free speed (5700RPM for NEO).
+	 *
+	 */
 	public void setCurrLimit(int stallLimit, int freeLimit) throws SparkMaxException {
 		throwIfNotOk(setSmartCurrentLimit(stallLimit, freeLimit));
 	}
 
+	/**
+	 * Sets the current limit in Amps.
+	 *
+	 * The motor controller will reduce the controller voltage output to avoid
+	 * surpassing this limit. This limit is enabled by default and used for
+	 * brushless only. This limit is highly recommended when using the NEO brushless
+	 * motor.
+	 *
+	 * The NEO Brushless Motor has a low internal resistance, which can mean large
+	 * current spikes that could be enough to cause damage to the motor and
+	 * controller. This current limit provides a smarter strategy to deal with high
+	 * current draws and keep the motor and controller operating in a safe region.
+	 *
+	 * The controller can also limit the current based on the RPM of the motor in a
+	 * linear fashion to help with controllability in closed loop control. For a
+	 * response that is linear the entire RPM range leave limit RPM at 0.
+	 *
+	 * @param stallLimit The current limit in Amps at 0 RPM.
+	 * @param freeLimit  The current limit at free speed (5700RPM for NEO).
+	 * @param limitRPM   RPM less than this value will be set to the stallLimit, RPM
+	 *                   values greater than limitRPM will scale linearly to
+	 *                   freeLimit
+	 *
+	 */
 	public void setCurrLimit(int stallLimit, int freeLimit, int limitRPM) throws SparkMaxException {
 		throwIfNotOk(setSmartCurrentLimit(stallLimit, freeLimit, limitRPM));
 	}
@@ -96,10 +162,64 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region Secondary Current Limit
 
+	/**
+	 * Sets the secondary current limit in Amps.
+	 *
+	 * The motor controller will disable the output of the controller briefly if the
+	 * current limit is exceeded to reduce the current. This limit is a simplified
+	 * 'on/off' controller. This limit is enabled by default but is set higher than
+	 * the default Smart Current Limit.
+	 *
+	 * The time the controller is off after the current limit is reached is
+	 * determined by the parameter limitCycles, which is the number of PWM cycles
+	 * (20kHz). The recommended value is the default of 0 which is the minimum time
+	 * and is part of a PWM cycle from when the over current is detected. This
+	 * allows the controller to regulate the current close to the limit value.
+	 *
+	 * The total time is set by the equation
+	 *
+	 * <code>
+	 * t = (50us - t0) + 50us * limitCycles
+	 * t = total off time after over current
+	 * t0 = time from the start of the PWM cycle until over current is detected
+	 * </code>
+	 *
+	 *
+	 * @param limit The current limit in Amps.
+	 *
+	 */
 	public void setSecondaryCurrLimit(double limit) throws SparkMaxException {
 		throwIfNotOk(setSecondaryCurrentLimit(limit));
 	}
 
+
+	/**
+	 * Sets the secondary current limit in Amps.
+	 *
+	 * The motor controller will disable the output of the controller briefly if the
+	 * current limit is exceeded to reduce the current. This limit is a simplified
+	 * 'on/off' controller. This limit is enabled by default but is set higher than
+	 * the default Smart Current Limit.
+	 *
+	 * The time the controller is off after the current limit is reached is
+	 * determined by the parameter limitCycles, which is the number of PWM cycles
+	 * (20kHz). The recommended value is the default of 0 which is the minimum time
+	 * and is part of a PWM cycle from when the over current is detected. This
+	 * allows the controller to regulate the current close to the limit value.
+	 *
+	 * The total time is set by the equation
+	 *
+	 * <code>
+	 * t = (50us - t0) + 50us * limitCycles
+	 * t = total off time after over current
+	 * t0 = time from the start of the PWM cycle until over current is detected
+	 * </code>
+	 *
+	 *
+	 * @param limit      The current limit in Amps.
+	 * @param chopCycles The number of additional PWM cycles to turn the driver off
+	 *                   after overcurrent is detected.
+	 */
 	public void setSecondaryCurrLimit(double limit, int chopCycles) throws SparkMaxException {
 		throwIfNotOk(setSecondaryCurrentLimit(limit, chopCycles));
 	}
@@ -108,10 +228,26 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region Neutral Mode
 
+	/**
+	 * Sets the Neutral/Brake/Idle mode setting for the SPARK MAX.
+	 *
+	 * @param idleMode Idle mode (coast or brake).
+	 *
+	 */
 	public void setNeutralMode(IdleMode idleMode) throws SparkMaxException {
 		throwIfNotOk(setIdleMode(idleMode));
 	}
 
+	/**
+	 * Gets the idle mode setting for the SPARK MAX.
+	 *
+	 * This uses the Get Parameter API and should be used infrequently. This
+	 * function uses a non-blocking call and will return a cached value if the
+	 * parameter is not returned by the timeout. The timeout can be changed by
+	 * calling SetCANTimeout(int milliseconds)
+	 *
+	 * @return IdleMode Idle mode setting
+	 */
 	public IdleMode getNeutralMode() {
 		return getIdleMode();
 	}
@@ -132,10 +268,26 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region Ramp Rate
 
+	/**
+	 * Sets the ramp rate for open loop control modes.
+	 * This is the maximum rate at which the motor controller's output is allowed to
+	 * change.
+	 * @param rate Time in seconds to go from 0 to full throttle.
+	 * @throws SparkMaxException
+	 */
 	public void setOpenLoopRamp(double rate) throws SparkMaxException {
 		throwIfNotOk(setOpenLoopRampRate(rate));
 	}
 
+	/**
+	 * Sets the ramp rate for closed loop control modes.
+	 *
+	 * This is the maximum rate at which the motor controller's output is allowed to
+	 * change.
+	 *
+	 * @param rate Time in seconds to go from 0 to full throttle.
+	 *
+	 */
 	public void setClosedLoopRamp(double rate) throws SparkMaxException {
 		throwIfNotOk(setClosedLoopRampRate(rate));
 	}
@@ -450,6 +602,36 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	public void setConfig(SparkConfig config) {
 		this.config = config;
+	}
+
+	//#endregion
+
+	//#region Inversion
+
+
+	/**
+	 * Enum to handle inversion of followers compared to leaders.
+	 * NORMAL: forward = forward
+	 * FOLLOW_LEADER: forward = leader
+	 * OPPOSE_LEADER: forward = !leader
+	 * INVERTED: forward = reverse
+	 */
+	public enum InvertType {
+		NORMAL(false), FOLLOW_LEADER(false), OPPOSE_LEADER(true), INVERTED(true);
+
+		public boolean inverted;
+
+		InvertType(boolean inverted) {
+			this.inverted = inverted;
+		}
+	}
+
+	/**
+	 * Set the invert type to NORMAL or INVERTED
+	 * @param invertType
+	 */
+	public void setInverted(InvertType invertType) {
+		setInverted(invertType.inverted);
 	}
 
 	//#endregion

@@ -7,8 +7,6 @@ import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.team2813.lib.talon.options.LimitDirection;
-import com.team2813.lib.talon.options.PIDProfile;
 
 /**
  * @author Adrian Guerra
@@ -625,6 +623,8 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #endregion
 
 	// #region unsorted
+
+	// FIXME: 12/28/2019 Need to rewrite PIDProfile.Profile for Talons
 
 	public void setP(PIDProfile.Profile slot, double p) throws CTREException {
 		throwIfNotOk(motorController.config_kP(slot.id, p, timeoutMode.value));

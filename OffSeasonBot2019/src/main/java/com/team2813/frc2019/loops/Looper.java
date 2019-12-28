@@ -44,6 +44,7 @@ public class Looper {
 				if (running) {
 					double now = Timer.getFPGATimestamp();
 
+					// remove actions that have finished
 					actions.removeIf(action -> {
 						if(action.update(now)){
 							action.end(now);
@@ -52,6 +53,8 @@ public class Looper {
 						else return false;
 					});
 
+					// Go thru each of the subsystem loops and run appropriate
+					// enabled or disabled loop
 					for (Loop loop : loops) {
 						double start = Timer.getFPGATimestamp();
 						loop.onAnyLoop(timestamp);
@@ -72,6 +75,7 @@ public class Looper {
 	};
 
 	public Looper(RobotMode mode) {
+		// Using the notifier to tell the robot to run.
 		notifier = new Notifier(runnable_);
 		running = false;
 		loops = new ArrayList<>();
@@ -80,16 +84,21 @@ public class Looper {
 	}
 
 	/**
+	 * Set robot to a mode ENABLED or DISABLED
 	 * @param newMode the mode to set
 	 */
 	public void setMode(RobotMode newMode) {
 		synchronized (taskRunningLock) {
 			timestamp = Timer.getFPGATimestamp();
+			// some actions should not continue after disabling. Remove these.
 			if (newMode == RobotMode.DISABLED) actions.removeIf(Action::getRemoveOnDisabled);
+			// Run the stop method of each loop.
 			for (Loop loop : loops) {
 				if(mode == RobotMode.ENABLED) loop.onEnabledStop(timestamp);
 				else if(mode == RobotMode.DISABLED) loop.onDisabledStop(timestamp);
 			}
+
+			//Run the start method of each loop.
 			for (Loop loop : loops) {
 				// System.out.println("Stopping " + loop);
 				if(mode == RobotMode.ENABLED) loop.onEnabledStart(timestamp);
