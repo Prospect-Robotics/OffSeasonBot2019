@@ -8,10 +8,10 @@ class SubsystemControlsConfig {
 	static Button pivotButton = driveJoystick.button(1);
 	static Button autoButton = driveJoystick.button(2);
 	static Axis driveX = driveJoystick.axis(0);
-	static Axis driveY = driveJoystick.axis(3);
+	static Axis driveY = driveJoystick.axis(1);
 	static Axis driveSteer = driveJoystick.axis(0);
-	static Axis driveForward = driveJoystick.axis(3);
-	static Axis driveReverse = driveJoystick.axis(2);
+	static Axis driveForward = driveJoystick.axis(4);
+	static Axis driveReverse = driveJoystick.axis(3);
 	static Button mainIntakeWheelIn = driveJoystick.button(3);
 	static Button mainIntakeWheelOut = driveJoystick.button(4);
 
