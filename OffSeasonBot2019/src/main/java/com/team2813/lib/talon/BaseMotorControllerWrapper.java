@@ -38,7 +38,6 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	 * @return value
 	 * @throws CTREException - if talon had error code
 	 */
-	//TODO better name for this
 	protected <T> T throwIfNotOkElseReturn(T value) throws CTREException {
 		throwLastError();
 		return value;
