@@ -13,6 +13,12 @@ public class VelocityDrive {
         this.maxVelocity = maxVelocity;
     }
 
+    /**
+     * Configure a CANSparkMaxWrapper with configuration for velocity drive.
+     * @param spark
+     * @param config
+     * @throws SparkMaxException
+     */
     public void configureMotor(CANSparkMaxWrapper spark, SparkConfig config) throws SparkMaxException {
         this.spark = spark;
         PIDControllerConfig pidConfig = config.getPidControllers().get(0);
@@ -28,14 +34,6 @@ public class VelocityDrive {
             spark.getPIDController().setSmartMotionMaxVelocity(maxVelocity, 0);
         this.maxVelocity = maxVelocity;
     }
-
-//    public void setAccelerating(boolean accelerating) {
-//        if (accelerating) {
-//            spark.getPIDController().setSmartMotionMaxAccel(maxAccel, 0);
-//        } else {
-//            spark.getPIDController().setSmartMotionMaxAccel(maxAccel * .4, 0);
-//        }
-//    }
 
     public double getVelocityFromDemand(double demand) {
         return maxVelocity * demand;
