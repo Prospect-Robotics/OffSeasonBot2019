@@ -15,10 +15,18 @@ public class SeriesAction implements Action {
 
 	private Action currentAction;
 
+	/**
+	 * Creates a new action from a list of actions to be run sequentially
+	 * @param actions
+	 */
 	public SeriesAction(List<? extends Action> actions) {
 		this.actions = new LinkedList<>(actions);
 	}
 
+	/**
+	 * Creates a new action from a list of actions to be run sequentially
+	 * @param actions
+	 */
 	public SeriesAction(Action... actions) {
 		this(Arrays.asList(actions));
 	}

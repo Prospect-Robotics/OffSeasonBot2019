@@ -1,5 +1,8 @@
 package com.team2813.lib.drive;
 
+/**
+ * Arcade Drive: determine steer using x, y, and a deadzone
+ */
 public class ArcadeDrive {
     private double deadzone;
 
@@ -23,10 +26,6 @@ public class ArcadeDrive {
             double xMax = 0.4;
             steer = 1.0 * x;
         }
-//
-//        System.out.println(throttleLeft + " " + throttleRight);
-
-//        System.out.println((throttleLeft - steer) + " " + (throttleLeft + steer));
 
         return new DriveDemand(throttleLeft + steer, throttleRight - steer);
     }
