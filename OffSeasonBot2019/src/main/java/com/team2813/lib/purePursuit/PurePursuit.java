@@ -285,7 +285,6 @@ public class PurePursuit {
         targetVelocities = rateLimiter(targetVelocities, maxRateOfChange);
         targetVelocities = targetVelocity(targetVelocities, maxAcceleration, path);
         double targetVelocity = targetVelocities[closestPointIndex];
-        double r = 1/c;
         double[] wheelVelocity = new double[2];
         double l = targetVelocity * (2 + (c * t))/2;
         double wvr = targetVelocity * (2 - (c * t))/2;
