@@ -15,10 +15,18 @@ public class ParallelAction implements Action {
 
 	private List<Action> actions;
 
+	/**
+	 * Creates a new action that runs a list of actions to be run simultaneously
+	 * @param actions
+	 */
 	public ParallelAction(List<? extends Action> actions) {
 		this.actions = new ArrayList<>(actions);
 	}
 
+	/**
+	 * Creates a new action that runs a list of actions to be run simultaneously
+	 * @param actions
+	 */
 	public ParallelAction(Action...actions) {
 		this(Arrays.asList(actions));
 	}

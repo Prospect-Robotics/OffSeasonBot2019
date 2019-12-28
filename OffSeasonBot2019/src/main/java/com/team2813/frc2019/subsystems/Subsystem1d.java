@@ -19,7 +19,7 @@ abstract class Subsystem1d<P extends Subsystem1d.Position> extends Subsystem {
 	Subsystem1d(CANSparkMaxWrapper motor) {
 		try {
 			this.motor = motor;
-			motor.setPeriodicFrame(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10);
+			motor.setPeriodicFrame(CANSparkMaxLowLevel.PeriodicFrame.kStatus2);
 			motor.set(0, ControlType.kDutyCycle);
 			motor.setNeutralMode(CANSparkMax.IdleMode.kBrake);
 		} catch (SparkMaxException e) {

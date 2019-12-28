@@ -9,6 +9,11 @@ public class FunctionAction implements Action {
 	private final Runnable function;
 	private final boolean removeOnDisabled;
 
+	/**
+	 * Creates a new action from a function
+	 * @param function
+	 * @param removeOnDisabled
+	 */
 	public FunctionAction(Runnable function, boolean removeOnDisabled) {
 		this.function = function;
 		this.removeOnDisabled = removeOnDisabled;
