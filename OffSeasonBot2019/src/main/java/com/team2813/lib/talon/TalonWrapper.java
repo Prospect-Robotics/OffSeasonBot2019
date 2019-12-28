@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.team2813.lib.talon.options.LimitDirection;
 
 public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
 

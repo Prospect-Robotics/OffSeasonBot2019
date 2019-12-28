@@ -1,4 +1,4 @@
-package com.team2813.lib.talon.options;
+package com.team2813.lib.talon;
 
 /**
  * @author Grady Whelan

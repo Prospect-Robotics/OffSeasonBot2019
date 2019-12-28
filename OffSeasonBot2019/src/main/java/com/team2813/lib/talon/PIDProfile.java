@@ -1,4 +1,4 @@
-package com.team2813.lib.talon.options;
+package com.team2813.lib.talon;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
@@ -11,28 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * @author Adrian Guerra
  */
-@Retention(RUNTIME)
-@Target(FIELD)
-@Documented
-@Repeatable(PIDProfiles.class)
-public @interface PIDProfile {
-	Profile profile();
-	
-	double p();
-	
-	double i();
-	
-	double d();
-	
-	double f();
-	
-	double maxIntegralAccumulator(); //TODO default value
-	
-	int integralZone();
-	
-	int allowableClosedLoopError();
-	
-	
+public class PIDProfile {
 	
 	// TODO document
 	public enum Profile {
