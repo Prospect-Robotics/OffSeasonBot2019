@@ -265,10 +265,26 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	//#region Ramp Rate
 
+	/**
+	 * Sets the ramp rate for open loop control modes.
+	 * This is the maximum rate at which the motor controller's output is allowed to
+	 * change.
+	 * @param rate Time in seconds to go from 0 to full throttle.
+	 * @throws SparkMaxException
+	 */
 	public void setOpenLoopRamp(double rate) throws SparkMaxException {
 		throwIfNotOk(setOpenLoopRampRate(rate));
 	}
 
+	/**
+	 * Sets the ramp rate for closed loop control modes.
+	 *
+	 * This is the maximum rate at which the motor controller's output is allowed to
+	 * change.
+	 *
+	 * @param rate Time in seconds to go from 0 to full throttle.
+	 *
+	 */
 	public void setClosedLoopRamp(double rate) throws SparkMaxException {
 		throwIfNotOk(setClosedLoopRampRate(rate));
 	}
@@ -577,6 +593,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 
 	/**
 	 * Enum to handle inversion of followers compared to leaders.
+	 * NORMAL: forward = forward
+	 * FOLLOW_LEADER: forward = leader
+	 * OPPOSE_LEADER: forward = !leader
+	 * INVERTED: forward = reverse
 	 */
 	public enum InvertType {
 		NORMAL(false), FOLLOW_LEADER(false), OPPOSE_LEADER(true), INVERTED(true);
