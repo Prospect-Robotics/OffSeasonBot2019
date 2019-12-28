@@ -7,8 +7,8 @@ import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Button;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
-import com.team2813.lib.talon.CTREException;
-import com.team2813.lib.talon.VictorWrapper;
+import com.team2813.lib.ctre.CTREException;
+import com.team2813.lib.ctre.VictorWrapper;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class GroundIntake extends Subsystem {

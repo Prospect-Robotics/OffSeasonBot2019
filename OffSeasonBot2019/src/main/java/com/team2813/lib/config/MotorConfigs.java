@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
-import com.team2813.lib.talon.VictorWrapper;
+import com.team2813.lib.ctre.VictorWrapper;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import java.io.File;

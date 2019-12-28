@@ -3,9 +3,9 @@ package com.team2813.lib.sparkMax;
 import com.revrobotics.*;
 import com.team2813.lib.config.Inverted;
 import com.team2813.lib.config.SparkConfig;
-import com.team2813.lib.talon.CTREException;
-import com.team2813.lib.talon.TalonWrapper;
-import com.team2813.lib.talon.VictorWrapper;
+import com.team2813.lib.ctre.CTREException;
+import com.team2813.lib.ctre.TalonWrapper;
+import com.team2813.lib.ctre.VictorWrapper;
 
 public class CANSparkMaxWrapper extends CANSparkMax {
 

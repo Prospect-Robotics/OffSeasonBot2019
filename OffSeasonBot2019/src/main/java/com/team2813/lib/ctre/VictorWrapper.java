@@ -1,4 +1,4 @@
-package com.team2813.lib.talon;
+package com.team2813.lib.ctre;
 
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 /*
