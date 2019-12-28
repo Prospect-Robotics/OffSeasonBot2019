@@ -2,6 +2,7 @@ package com.team2813.lib.sparkMax;
 
 import com.revrobotics.*;
 import com.team2813.lib.config.Inverted;
+import com.team2813.lib.config.PeriodicFrame;
 import com.team2813.lib.config.SparkConfig;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
@@ -309,6 +310,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 		throwIfNotOk(setCANTimeout(timeoutMs));
 	}
 
+	public void setTimeout() throws SparkMaxException {
+		setTimeout(TimeoutMode.RUNNING.valueMs);
+	}
+
 	//#region Motor Type
 
 	public void setTypeOfMotor(MotorType type) throws SparkMaxException {
@@ -345,6 +350,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 	 */
 	public void setPeriodicFrame(PeriodicFrame frameID, int periodMs) throws SparkMaxException {
 		throwIfNotOk(setPeriodicFramePeriod(frameID, periodMs));
+	}
+
+	public void setPeriodicFrame(PeriodicFrame frameID) throws SparkMaxException {
+		setPeriodicFrame(frameID, TimeoutMode.RUNNING.valueMs);
 	}
 
 	public void setEncoderPosition(double position) throws SparkMaxException {
@@ -622,5 +631,23 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 	}
 
 	//#endregion
+
+	/**
+	 * Enum storing different timeout values in ms for construction time
+	 * or runtime updates.
+	 */
+	public enum TimeoutMode {
+		/** Longer timeout, used for constructors */
+		CONSTRUCTING(100),
+		/** Shorter timeout, used for on the fly updates */
+		RUNNING(10),
+		NO_TIMEOUT(0);
+
+		final int valueMs;
+
+		private TimeoutMode(int valueMs) {
+			this.valueMs = valueMs;
+		}
+	}
 
 }
