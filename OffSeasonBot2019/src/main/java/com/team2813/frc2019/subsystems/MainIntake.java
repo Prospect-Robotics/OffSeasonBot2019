@@ -25,17 +25,17 @@ public class MainIntake extends Subsystem1d<MainIntake.Position> {
 
     private static CANSparkMaxWrapper wheelMotor = MotorConfigs.sparks.get("mainIntakeWheel");
 
-    private static final Button HOME = SubsystemControlsConfig.mainIntakeHome;
-    private static final Button PLACE_FORWARD = SubsystemControlsConfig.mainIntakePlacePieceForward;
-    private static final Button PLACE_REVERSE = SubsystemControlsConfig.mainIntakePlacePieceReverse;
-    private static final Button CARGO_PICKUP = SubsystemControlsConfig.mainIntakeCargoPickup;
-    private static final Button CARGO_ROCKET_HOLD = SubsystemControlsConfig.mainIntakeCargoRocketHold;
+    private static final Button HOME = SubsystemControlsConfig.getMainIntakeHome();
+    private static final Button PLACE_FORWARD = SubsystemControlsConfig.getMainIntakePlacePieceForward();
+    private static final Button PLACE_REVERSE = SubsystemControlsConfig.getMainIntakePlacePieceReverse();
+    private static final Button CARGO_PICKUP = SubsystemControlsConfig.getMainIntakeCargoPickup();
+    private static final Button CARGO_ROCKET_HOLD = SubsystemControlsConfig.getMainIntakeCargoRocketHold();
 
-    private static final Button WHEEL_IN = SubsystemControlsConfig.mainIntakeWheelIn;
-    private static final Button WHEEL_OUT = SubsystemControlsConfig.mainIntakeWheelOut;
-    private static final Button TOGGLE_MODE = SubsystemControlsConfig.mainIntakeToggleMode;
+    private static final Button WHEEL_IN = SubsystemControlsConfig.getMainIntakeWheelIn();
+    private static final Button WHEEL_OUT = SubsystemControlsConfig.getMainIntakeWheelOut();
+    private static final Button TOGGLE_MODE = SubsystemControlsConfig.getMainIntakeToggleMode();
 
-    private static final Axis FINE_CONTROL = SubsystemControlsConfig.mainIntakeArmFineControl;
+    private static final Axis FINE_CONTROL = SubsystemControlsConfig.getMainIntakeArmFineControl();
     private static final double FINE_CONTROL_DEADZONE = 0.02;
 
     private static final double WHEEL_PERCENT = 1.0;

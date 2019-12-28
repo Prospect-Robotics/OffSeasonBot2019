@@ -23,7 +23,7 @@ public class GroundIntake extends Subsystem {
 
 //    private static final Button ROLLER_OUT = SubsystemControlsConfig.groundIntakeRollerOut;
 //    private static final Button ROLLER_IN = SubsystemControlsConfig.groundIntakeRollerIn;
-    private static final Button TOGGLE_POSITION = SubsystemControlsConfig.groundIntakeTogglePosition;
+    private static final Button TOGGLE_POSITION = SubsystemControlsConfig.getGroundIntakeTogglePosition();
 
     private static final VictorWrapper ROLLER = MotorConfigs.victors.get("groundIntakeRoller");
 	private static final double ROLLER_SPEED = .8;

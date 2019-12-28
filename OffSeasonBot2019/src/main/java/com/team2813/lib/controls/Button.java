@@ -1,7 +1,5 @@
 package com.team2813.lib.controls;
 
-import edu.wpi.first.wpilibj.Joystick;
-
 /**
  * The Button object is a Joystick button
  * that has methods to trigger functions while
@@ -10,41 +8,65 @@ import edu.wpi.first.wpilibj.Joystick;
  * @author Grady Whelan
  */
 public class Button {
-	private Joystick joystick;
+	private Controller controller;
 	private int buttonNumber;
 
 	/**
-	 * Create a joystick button for triggering functions.
+	 * Create a controller button for triggering functions.
 	 *
-	 * @param joystick     The Joystick object that has the button
+	 * @param controller     The Controller object that has the button
 	 * @param buttonNumber The button number
 	 */
-	public Button(Joystick joystick, int buttonNumber) {
-		this.joystick = joystick;
+	public Button(Controller controller, int buttonNumber) {
+		this.controller = controller;
 		this.buttonNumber = buttonNumber;
 	}
 
+	/**
+	 * Run if button raw boolean is true
+	 * @param function
+	 */
 	public void whileHeld(Runnable function) {
 		if (get()) function.run();
 	}
 
+	/**
+	 * Run if button has been released and pressed again since last whenPressed call
+	 * @param function
+	 */
 	public void whenPressed(Runnable function) {
 		if (getPressed()) function.run();
 	}
 
+	/**
+	 * Run if button has been released since last whenReleased call
+	 * @param function
+	 */
 	public void whenReleased(Runnable function) {
 		if (getReleased()) function.run();
 	}
 
+	/**
+	 * Get current raw boolean value from button
+	 * @return true if currently pressed
+	 */
 	public boolean get()  {
-		return joystick.getRawButton(buttonNumber);
+		return controller.getRawButton(buttonNumber);
 	}
 
+	/**
+	 * Get whether button has been released and pressed again since last call
+	 * @return true if released and pressed again since last call
+	 */
 	public boolean getPressed() {
-		return joystick.getRawButtonPressed(buttonNumber);
+		return controller.getRawButtonPressed(buttonNumber);
 	}
 
+	/**
+	 * Get whether button has been released since last call
+	 * @return true if released since last call
+	 */
 	public boolean getReleased() {
-		return joystick.getRawButtonReleased(buttonNumber);
+		return controller.getRawButtonReleased(buttonNumber);
 	}
 }

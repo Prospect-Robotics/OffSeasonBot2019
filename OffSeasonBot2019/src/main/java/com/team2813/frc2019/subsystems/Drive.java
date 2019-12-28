@@ -40,14 +40,14 @@ public class Drive extends Subsystem {
 
     // Controls
     private static final double TELEOP_DEAD_ZONE = 0.01;
-    private static final Axis ARCADE_X_AXIS = SubsystemControlsConfig.driveX;
-    private static final Axis ARCADE_Y_AXIS = SubsystemControlsConfig.driveY;
-    private static final Axis CURVATURE_STEER = SubsystemControlsConfig.driveSteer;
-    private static final Axis CURVATURE_FORWARD = SubsystemControlsConfig.driveForward;
-    private static final Axis CURVATURE_REVERSE = SubsystemControlsConfig.driveReverse;
-    private static final Button PIVOT_BUTTON = SubsystemControlsConfig.pivotButton;
+    private static final Axis ARCADE_X_AXIS = SubsystemControlsConfig.getDriveX();
+    private static final Axis ARCADE_Y_AXIS = SubsystemControlsConfig.getDriveY();
+    private static final Axis CURVATURE_STEER = SubsystemControlsConfig.getDriveSteer();
+    private static final Axis CURVATURE_FORWARD = SubsystemControlsConfig.getDriveForward();
+    private static final Axis CURVATURE_REVERSE = SubsystemControlsConfig.getDriveReverse();
+    private static final Button PIVOT_BUTTON = SubsystemControlsConfig.getPivotButton();
     private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
-    private static final Button AUTO_BUTTON = SubsystemControlsConfig.autoButton;
+    private static final Button AUTO_BUTTON = SubsystemControlsConfig.getAutoButton();
 
     // Mode
     private static DriveMode driveMode = DriveMode.OPEN_LOOP;
