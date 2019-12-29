@@ -7,9 +7,12 @@ import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.team2813.lib.config.PeriodicFrame;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
+import com.team2813.lib.sparkMax.options.SparkMaxOptions;
 import com.team2813.lib.talon.options.LimitDirection;
 import com.team2813.lib.talon.options.PIDProfile;
+import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 
 /**
  * @author Adrian Guerra
@@ -107,7 +110,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	 * @param type
 	 */
 	public void setInverted(boolean type) throws CTREException {
-		invertType = type;
+		boolean invertType = type;
 		motorController.setInverted(type);
 		throwLastError();
 	}
@@ -647,7 +650,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 		throwIfNotOk(motorController.config_kF(slot.id, f, timeoutMode.value));
 	}
 
-	public void setPIDF(int slot, double p, double i, double d, double f) throws CTREException {
+	public void setPIDF(PIDProfile.Profile slot, double p, double i, double d, double f) throws CTREException {
 		setP(slot, p);
 		setI(slot, i);
 		setD(slot, d);
@@ -791,6 +794,10 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 		private VelocityMeasurementWindow(int value) {
 			this.value = value;
 		}
+	}
+
+	public void setPeriodicFrame(PeriodicFrame frameID, int periodMs){
+
 	}
 
 	// #endregion

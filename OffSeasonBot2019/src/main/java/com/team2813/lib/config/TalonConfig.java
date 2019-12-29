@@ -3,6 +3,8 @@ package com.team2813.lib.config;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.team2813.lib.talon.BaseMotorControllerWrapper;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TalonConfig extends MotorConfig {
 
@@ -17,7 +19,9 @@ public class TalonConfig extends MotorConfig {
     private double closedLoopRampRate;
     private double openLoopRampRate;
     private boolean invertSensorPhase;
-    private StatusFrameEnhanced statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
+    private Inverted inverted;
+    private List<FollowerConfig> followers = new ArrayList<>();
+    private PeriodicFrame statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
     private int statusFramePeriod = 5;
     private VelocityMeasPeriod velocityMeasurementPeriod;
     private BaseMotorControllerWrapper.VelocityMeasurementWindow velocityMeasurementWindow;
@@ -112,11 +116,11 @@ public class TalonConfig extends MotorConfig {
         this.invertSensorPhase = invertSensorPhase;
     }
 
-    public StatusFrameEnhanced getStatusFrame() {
+    public PeriodicFrame getStatusFrame() {
         return statusFrame;
     }
 
-    public void setStatusFrame(StatusFrameEnhanced statusFrame) {
+    public void setStatusFrame(PeriodicFrame statusFrame) {
         this.statusFrame = statusFrame;
     }
 
@@ -145,10 +149,10 @@ public class TalonConfig extends MotorConfig {
     }
 
     public Inverted getInverted() {
-
+        return inverted;
     }
 
-    public FollowerConfig[] getFollowers() {
-
+    public List<FollowerConfig> getFollowers() {
+        return followers;
     }
 }

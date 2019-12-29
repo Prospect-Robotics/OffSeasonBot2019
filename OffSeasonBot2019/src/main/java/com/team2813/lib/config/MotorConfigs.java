@@ -39,7 +39,7 @@ public class MotorConfigs {
         System.out.println("Successful!");
     }
 
-    private static <TalonException> TalonWrapper initializeTalon(TalonConfig config) throws TalonException, CTREException, SparkMaxException {
+    private static <TalonException extends Throwable> TalonWrapper initializeTalon(TalonConfig config) throws TalonException, CTREException, SparkMaxException {
         for (Integer id : ids)
             if (id == config.getDeviceNumber()){
                 System.err.println("Tried to register talon with already used id");
@@ -60,7 +60,7 @@ public class MotorConfigs {
         talon.setOpenLoopRamp(config.getOpenLoopRampRate());
         talon.setClosedLoopRamp(config.getClosedLoopRampRate());
 
-        talon.setPeriodicFrame(config.getStatusFrame().getValue(), config.getStatusFramePeriod());
+        talon.setPeriodicFrame(config.getStatusFrame(), config.getStatusFramePeriod());
 //					talon.setSmartMotionMaxVelocity(config.motionCruiseVelocity()); // FIXME: 09/20/2019 need to change parameters/types
 //					talon.setSmartMotionMaxAccel(config.motionAcceleration()); // FIXME: 09/20/2019 need to change parameters/types
 
