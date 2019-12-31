@@ -5,6 +5,7 @@ import com.team2813.lib.sparkMax.options.InvertType;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
+import com.team2813.lib.talon.options.PIDProfile;
 import edu.wpi.first.wpilibj.Spark;
 
 public class CANSparkMaxWrapper extends CANSparkMax {
@@ -362,15 +363,15 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 		return getPIDController().getOutputMax(slotID);
 	}
 
-	public void setSmartMotionMaxVelocity(double maxVel, int slotID) throws SparkMaxException {
+	public void setSmartMotionMaxVelocity(double maxVel, PIDProfile.Profile slotID) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setSmartMotionMaxVelocity(maxVel, slotID));
 	}
 
-	public void setSmartMotionMaxAccel(double maxAccel, int slotID) throws SparkMaxException {
+	public void setSmartMotionMaxAccel(double maxAccel, PIDProfile.Profile slotID) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setSmartMotionMaxAccel(maxAccel, slotID));
 	}
 
-	public void setSmartMotionMinOutputVelocity(double minVel, int slotID) throws SparkMaxException {
+	public void setSmartMotionMinOutputVelocity(double minVel, PIDProfile.Profile slotID) throws SparkMaxException {
 		throwIfNotOk(getPIDController().setSmartMotionMinOutputVelocity(minVel, slotID));
 	}
 

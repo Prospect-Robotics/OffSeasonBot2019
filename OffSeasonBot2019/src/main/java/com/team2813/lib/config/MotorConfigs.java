@@ -8,6 +8,7 @@ import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
 import com.team2813.lib.talon.options.InvertType;
+import com.team2813.lib.talon.options.PIDProfile;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Talon;
 
@@ -79,7 +80,7 @@ public class MotorConfigs {
 
 
         for (PIDControllerConfig pidController : config.getPidControllers()) {
-            int slotID = config.getPidControllers().indexOf(pidController);
+            PIDProfile.Profile slotID = PIDProfile.Profile(config.getPidControllers().indexOf(pidController));
             talon.setPIDF(slotID, pidController.getP(), pidController.getI(),
                     pidController.getD(), pidController.getF());
             talon.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
