@@ -2,10 +2,7 @@ package com.team2813.lib.ctre;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
-import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix.sensors.PigeonIMU_ControlFrame;
-import com.ctre.phoenix.sensors.PigeonIMU_Faults;
-import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
+import com.ctre.phoenix.sensors.*;
 
 public class PigeonWrapper {
 
@@ -203,6 +200,30 @@ public class PigeonWrapper {
 
 	public void getFaults(PigeonIMU_Faults toFill) throws CTREException {
 		throwIfNotOk(pigeon.getFaults(toFill));
+	}
+
+	public void getStickyFaults(PigeonIMU_StickyFaults toFill) throws CTREException {
+		throwIfNotOk(pigeon.getStickyFaults(toFill));
+	}
+
+	public void clearStickyFaults() throws CTREException {
+		throwIfNotOk(pigeon.clearStickyFaults());
+	}
+
+	public void configAllSettings(PigeonIMUConfiguration allConfigs, int timeoutMs) throws CTREException {
+		throwIfNotOk(pigeon.configAllSettings(allConfigs, timeoutMs));
+	}
+
+	public void configAllSettings(PigeonIMUConfiguration allConfigs) throws CTREException {
+		throwIfNotOk(pigeon.configAllSettings(allConfigs));
+	}
+
+	public void configFactoryDefault(int timeoutMs) throws CTREException {
+		throwIfNotOk(pigeon.configFactoryDefault(timeoutMs));
+	}
+
+	public void configFactoryDefault() throws CTREException {
+		throwIfNotOk(pigeon.configFactoryDefault());
 	}
 
 }
