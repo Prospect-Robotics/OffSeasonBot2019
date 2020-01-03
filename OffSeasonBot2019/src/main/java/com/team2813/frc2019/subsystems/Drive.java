@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveWheelSpeeds;
@@ -134,24 +135,24 @@ public class Drive extends Subsystem {
             prevRight = RIGHT.getEncoderPosition();
 
             // testing ramsete
-            auto = new RamseteAuto(kinematics,
-                    new Pose2d(0, 0, new Rotation2d(0)),
-                    List.of(),
-                    new Pose2d(2, 0, new Rotation2d(0)));
 //            auto = new RamseteAuto(kinematics,
-//                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-//                    List.of(new Translation2d(2, 0),
-//                            new Translation2d(2, -1.7)),
-//                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)));
-//            auto.next(new RamseteAuto(kinematics,
-//                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)),
-//                    List.of(new Translation2d(2, -1)),
-//                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
+//                    new Pose2d(0, 0, new Rotation2d(0)),
+//                    List.of(),
+//                    new Pose2d(2, 0, new Rotation2d(0)));
+            auto = new RamseteAuto(kinematics,
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+                    List.of(new Translation2d(2, 0),
+                            new Translation2d(2, -1.7)),
+                    new Pose2d(0, -1.7, Rotation2d.fromDegrees(180)));
+            auto.next(new RamseteAuto(kinematics,
+                    new Pose2d(0, -1.7, Rotation2d.fromDegrees(180)),
+                    List.of(new Translation2d(2, -1)),
+                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
 
 //            auto = new RamseteAuto(kinematics,
-//                    new Pose2d(4, 4, Rotation2d.fromDegrees(90)),
-//                    List.of(new Translation2d(2, 2)),
-//                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)), true);
+//                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+//                    List.of(new Translation2d(4, 2)),
+//                    new Pose2d(4, 4, Rotation2d.fromDegrees(90)));
         } catch (SparkMaxException e) {
             velocityFailed = true;
             e.printStackTrace();
@@ -164,8 +165,7 @@ public class Drive extends Subsystem {
 
         if (AUTO_BUTTON.get()) {
             if (auto != null) {
-                driveDemand = new DriveDemand(new DifferentialDriveWheelSpeeds(1, 1));
-//                driveDemand = auto.getDemand(odometry.getPoseMeters());
+                driveDemand = auto.getDemand(odometry.getPoseMeters());
             }
         } else if (driveType == TeleopDriveType.ARCADE) {
             if (auto != null) auto.reset();
@@ -249,7 +249,7 @@ public class Drive extends Subsystem {
 
     protected synchronized void writePeriodicOutputs_() throws SparkMaxException {
         if (driveMode == DriveMode.SMART_VELOCITY) {
-            double kR = 1.3; // ratio constant
+            double kR = 1.31; // ratio constant
             double left = driveDemand.getLeft() * kR;
             double right = driveDemand.getRight() * kR;
             LEFT.set(left, driveMode.controlType, 0, feedforward.calculate(left / 60));
