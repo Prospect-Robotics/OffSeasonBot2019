@@ -50,6 +50,7 @@ public class RamseteAuto {
         }
         Trajectory.State goal = trajectory.sample(tDelta); // sample the trajectory
         ChassisSpeeds adjustedSpeeds = controller.calculate(currentRobotPose, goal);
+        System.out.println(new DriveDemand(kinematics.toWheelSpeeds(adjustedSpeeds)));
         return new DriveDemand(kinematics.toWheelSpeeds(adjustedSpeeds));
     }
 

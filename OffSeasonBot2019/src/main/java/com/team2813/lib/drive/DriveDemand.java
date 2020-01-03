@@ -14,8 +14,8 @@ public class DriveDemand {
     }
 
     public DriveDemand(DifferentialDriveWheelSpeeds wheelSpeeds) { // to rpm
-        left = Units.metersToInches(wheelSpeeds.leftMetersPerSecond) / circumference / 60;
-        right = Units.metersToInches(wheelSpeeds.rightMetersPerSecond) / circumference / 60;
+        left = Units.metersToInches(wheelSpeeds.leftMetersPerSecond) * 60 / circumference / (9.0 / 60);
+        right = Units.metersToInches(wheelSpeeds.rightMetersPerSecond) * 60 / circumference / (9.0 / 60);
     }
 
     public double getLeft() {

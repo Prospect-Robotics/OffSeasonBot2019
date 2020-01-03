@@ -1,6 +1,5 @@
 package com.team2813.frc2019.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
 import com.team2813.lib.auto.RamseteAuto;
@@ -17,14 +16,10 @@ import com.team2813.lib.talon.CTREException;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveWheelSpeeds;
@@ -73,8 +68,11 @@ public class Drive extends Subsystem {
     private static final TeleopDriveType TELEOP_DRIVE_TYPE = TeleopDriveType.CURVATURE;
     private static final Button AUTO_BUTTON = SubsystemControlsConfig.autoButton;
 
+    // Drive
+    public SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.15, 0.068, 0.00686);
+
     // Mode
-    private static DriveMode driveMode = DriveMode.OPEN_LOOP;
+    private static DriveMode driveMode = DriveMode.SMART_VELOCITY;
 
     // Auto
     private static final double ENCODER_TICKS_PER_DEGREE_TANK_TURN = 0.0; // TODO: 10/05/2019 need to find correct value using robot
@@ -95,7 +93,7 @@ public class Drive extends Subsystem {
     NetworkTableEntry tx = table.getEntry("tx");
     NetworkTableEntry camtranEntry = table.getEntry("camtran");
 
-    private static final int MAX_VELOCITY = 18000; // max velocity of velocity drive in rpm
+    private static final int MAX_VELOCITY = 5500; // max velocity of velocity drive in rpm
     VelocityDrive velocityDrive = new VelocityDrive(MAX_VELOCITY);
     CurvatureDrive curvatureDrive = new CurvatureDrive(TELEOP_DEAD_ZONE);
     ArcadeDrive arcadeDrive = curvatureDrive.getArcadeDrive();
@@ -112,6 +110,11 @@ public class Drive extends Subsystem {
     private boolean velocityEnabled = velocityEntry.getNumber(0).intValue() == 1;
     private boolean velocityFailed = false;
 
+    // metrics
+    private long prevTime;
+    private double prevLeft;
+    private double prevRight;
+
     Drive() {
         try {
             velocityDrive.configureMotor(LEFT, MotorConfigs.motorConfigs.getSparks().get("driveLeft"));
@@ -126,20 +129,24 @@ public class Drive extends Subsystem {
 
             DriveDemand.circumference = WHEEL_CIRCUMFERENCE;
 
+            prevTime = System.currentTimeMillis();
+            prevLeft = LEFT.getEncoderPosition();
+            prevRight = RIGHT.getEncoderPosition();
+
             // testing ramsete
-//            auto = new RamseteAuto(kinematics,
-//                    new Pose2d(0, 0, new Rotation2d(0)),
-//                    List.of(new Translation2d(2, 0)),
-//                    new Pose2d(2, 0, new Rotation2d(0)));
             auto = new RamseteAuto(kinematics,
-                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-                    List.of(new Translation2d(2, 0),
-                            new Translation2d(2, -1.7)),
-                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)));
-            auto.next(new RamseteAuto(kinematics,
-                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)),
-                    List.of(new Translation2d(2, -1)),
-                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
+                    new Pose2d(0, 0, new Rotation2d(0)),
+                    List.of(),
+                    new Pose2d(2, 0, new Rotation2d(0)));
+//            auto = new RamseteAuto(kinematics,
+//                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+//                    List.of(new Translation2d(2, 0),
+//                            new Translation2d(2, -1.7)),
+//                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)));
+//            auto.next(new RamseteAuto(kinematics,
+//                    new Pose2d(-0.7, -1.7, Rotation2d.fromDegrees(180)),
+//                    List.of(new Translation2d(2, -1)),
+//                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
 
 //            auto = new RamseteAuto(kinematics,
 //                    new Pose2d(4, 4, Rotation2d.fromDegrees(90)),
@@ -157,7 +164,8 @@ public class Drive extends Subsystem {
 
         if (AUTO_BUTTON.get()) {
             if (auto != null) {
-                driveDemand = auto.getDemand(odometry.getPoseMeters());
+                driveDemand = new DriveDemand(new DifferentialDriveWheelSpeeds(1, 1));
+//                driveDemand = auto.getDemand(odometry.getPoseMeters());
             }
         } else if (driveType == TeleopDriveType.ARCADE) {
             if (auto != null) auto.reset();
@@ -167,6 +175,9 @@ public class Drive extends Subsystem {
             driveDemand = curvatureDrive.getDemand(CURVATURE_FORWARD.get(), CURVATURE_REVERSE.get(), CURVATURE_STEER.get(), PIVOT_BUTTON.get());
         }
 
+        if (driveMode == DriveMode.SMART_VELOCITY && !AUTO_BUTTON.get()) {
+            driveDemand = velocityDrive.getDemand(driveDemand);
+        }
     }
 
     public Rotation2d getHeading() {
@@ -196,13 +207,23 @@ public class Drive extends Subsystem {
         SmartDashboard.putString("Pose", odometry.getPoseMeters().toString());
         SmartDashboard.putNumber("Left Pos", LEFT.getEncoderPosition());
         SmartDashboard.putNumber("Right Pos", RIGHT.getEncoderPosition());
-        SmartDashboard.putNumber("Autonomous ΔT", auto.getTimeDelta());
+//        SmartDashboard.putNumber("Left Velocity", ((LEFT.getEncoderPosition() - prevLeft) / (System.currentTimeMillis() - prevTime)) * 1000 * 60);
+//        SmartDashboard.putNumber("Right Velocity", ((RIGHT.getEncoderPosition() - prevRight) / (System.currentTimeMillis() - prevTime)) * 1000 * 60);
+        SmartDashboard.putNumber("Left Velocity", LEFT.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Right Velocity", LEFT.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Left Demand", driveDemand.getLeft());
+        SmartDashboard.putNumber("Right Demand", driveDemand.getRight());
+        SmartDashboard.putNumber("Autonomous Time", auto.getTimeDelta());
+
+        prevTime = System.currentTimeMillis();
+        prevLeft = LEFT.getEncoderPosition();
+        prevRight = RIGHT.getEncoderPosition();
     }
 
     @Override
     protected void teleopControls_() throws CTREException, SparkMaxException {
         if (!isAuto) {
-            driveMode = DriveMode.OPEN_LOOP;
+            driveMode = DriveMode.SMART_VELOCITY;
             teleopDrive(TELEOP_DRIVE_TYPE);
         } else {
             driveMode = DriveMode.SMART_MOTION;
@@ -227,8 +248,16 @@ public class Drive extends Subsystem {
     }
 
     protected synchronized void writePeriodicOutputs_() throws SparkMaxException {
-        LEFT.set(driveDemand.getLeft(), driveMode.controlType);
-        RIGHT.set(driveDemand.getRight(), driveMode.controlType);
+        if (driveMode == DriveMode.SMART_VELOCITY) {
+            double kR = 1.3; // ratio constant
+            double left = driveDemand.getLeft() * kR;
+            double right = driveDemand.getRight() * kR;
+            LEFT.set(left, driveMode.controlType, 0, feedforward.calculate(left / 60));
+            RIGHT.set(right, driveMode.controlType, 0, feedforward.calculate(right / 60));
+        } else {
+            LEFT.set(driveDemand.getLeft(), driveMode.controlType);
+            RIGHT.set(driveDemand.getRight(), driveMode.controlType);
+        }
     }
 
     public synchronized void setBrakeMode(boolean brake) {
