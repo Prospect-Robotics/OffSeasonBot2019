@@ -25,6 +25,8 @@ public class MotorConfigs {
     public static Map<String, TalonConfig> talons = new HashMap<>();
     public static Map<String, VictorWrapper> victors = new HashMap<>();
 
+    public static RootConfigs motorConfigs;
+
     private static List<Integer> ids = new ArrayList<>();
 
     public static void read() throws IOException {
@@ -32,7 +34,7 @@ public class MotorConfigs {
         File configFile = new File(deployDirectory.getAbsolutePath() + "/motorConfig.yaml");
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        RootConfigs motorConfigs = mapper.readValue(configFile, RootConfigs.class);
+        motorConfigs = mapper.readValue(configFile, RootConfigs.class);
 
         motorConfigs.getSparks().forEach(((s, sparkConfig) -> sparks.put(s, initializeSpark(sparkConfig))));
         motorConfigs.getVictors().forEach(((s, victorConfig) -> victors.put(s, initializeVictor(victorConfig))));
@@ -158,10 +160,11 @@ public class MotorConfigs {
 
 
             Inverted inverted = config.getInverted();
+
             if (inverted != null)
                 spark.setInverted(inverted == Inverted.INVERTED);
             else
-                spark.setInverted(com.team2813.lib.sparkMax.options.InvertType.NORMAL.inverted);
+                spark.setInverted(com.team2813.lib.sparkMax.CANSparkMaxWrapper.InvertType.NORMAL.inverted);
 
             for (FollowerConfig followerConfig : config.getFollowers()) {
                 System.out.println(
@@ -170,6 +173,8 @@ public class MotorConfigs {
                 CANSparkMaxWrapper sparkMaxFollower = new CANSparkMaxWrapper(followerConfig.getId(), followerConfig.getType().getValue());
                 sparkMaxFollower.follow(spark, followerConfig.getInverted().inverted);
             }
+
+            spark.setConfig(config);
         } catch (SparkMaxException e) {
             e.printStackTrace();
         }
@@ -190,35 +195,35 @@ public class MotorConfigs {
         // TODO IMPLEMENT OPTIONS
         return new VictorWrapper(config.getDeviceNumber(), config.getSubsystemName());
     }
-}
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-class RootConfigs {
-    private Map<String, SparkConfig> sparks;
-    private Map<String, TalonConfig> talons;
-    private Map<String, VictorConfig> victors;
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public static class RootConfigs {
+        private Map<String, SparkConfig> sparks;
+        private Map<String, TalonConfig> talons;
+        private Map<String, VictorConfig> victors;
 
-    public Map<String, SparkConfig> getSparks() {
-        return sparks;
-    }
+        public Map<String, SparkConfig> getSparks() {
+            return sparks;
+        }
 
-    public void setSparks(Map<String, SparkConfig> sparks) {
-        this.sparks = sparks;
-    }
+        public void setSparks(Map<String, SparkConfig> sparks) {
+            this.sparks = sparks;
+        }
 
-    public Map<String, TalonConfig> getTalons() {
-        return talons;
-    }
+        public Map<String, TalonConfig> getTalons() {
+            return talons;
+        }
 
-    public void setTalons(Map<String, TalonConfig> talons) {
-        this.talons = talons;
-    }
+        public void setTalons(Map<String, TalonConfig> talons) {
+            this.talons = talons;
+        }
 
-    public Map<String, VictorConfig> getVictors() {
-        return victors;
-    }
+        public Map<String, VictorConfig> getVictors() {
+            return victors;
+        }
 
-    public void setVictors(Map<String, VictorConfig> victors) {
-        this.victors = victors;
+        public void setVictors(Map<String, VictorConfig> victors) {
+            this.victors = victors;
+        }
     }
 }

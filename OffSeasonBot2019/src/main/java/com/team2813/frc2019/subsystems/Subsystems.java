@@ -8,6 +8,10 @@ import com.team2813.frc2019.Robot.RobotMode;
 import com.team2813.frc2019.loops.Looper;
 import com.team2813.frc2019.loops.Loop;
 
+/**
+ * Stores a list of all subsystems and initializes them and
+ * runs a loop to put things on the SmartDashboard.
+ */
 public class Subsystems {
 
 	public static List<Subsystem> allSubsystems;

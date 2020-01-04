@@ -41,6 +41,7 @@ public class PistonSolenoid {
 	}
 
 	public PistonState get() {
+		// TODO fix could cause problems
 		return PistonState.from(solenoids.get(0).get());
 	}
 
