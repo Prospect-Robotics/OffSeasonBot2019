@@ -93,9 +93,4 @@ public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
 			setReverseLimitSwitchSource(type, normalOpenOrClose);
 		}
 	}
-
-    @Override
-    public void setCurrLimit(int peakCurrentLimit) {
-
-    }
 }

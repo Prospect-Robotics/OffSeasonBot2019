@@ -744,12 +744,6 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 		}
 	}
 
-	public abstract void setCurrLimit(int peakCurrentLimit);
-
-	public abstract void setSecondaryCurrLimit(int continuousCurrentLimitAmps);
-
-	public abstract CANSparkMaxWrapper getPIDController();
-
 	// TODO document
 	public enum TimeoutMode {
 		/** Longer timeout, used for constructors */

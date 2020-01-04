@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public class PIDProfile {
 	
 	// TODO document
-	enum Profile {
+	public enum Profile {
 		PRIMARY(0),
 		SECONDARY(1);
 

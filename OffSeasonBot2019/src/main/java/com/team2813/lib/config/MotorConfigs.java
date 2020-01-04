@@ -8,7 +8,7 @@ import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
 import com.team2813.lib.talon.options.InvertType;
-import com.team2813.lib.talon.options.PIDProfile;
+import com.team2813.lib.talon.PIDProfile;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Talon;
 
@@ -86,9 +86,11 @@ public class MotorConfigs {
                     PIDProfile.Profile.PRIMARY : PIDProfile.Profile.SECONDARY;
             talon.setPIDF(slotID, pidController.getP(), pidController.getI(),
                     pidController.getD(), pidController.getF());
-            talon.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
-            talon.getPIDController().setSmartMotionMaxAccel(pidController.getMaxAcceleration(), slotID);
-            talon.getPIDController().setSmartMotionMinOutputVelocity(pidController.getMinVelocity(), slotID);
+            talon.setMotionMagicCruiseVelocity((int) pidController.getMaxVelocity()); // FIXME: 1/3/2020 Casting because
+                                                                                        // talon uses encoder ticks
+                                                                                        // TODO deal with units issue
+            talon.setMotionMagicAcceleration((int) pidController.getMaxAcceleration()); // FIXME see above
+            // TODO: 1/3/2020 figure out min velocity with Talons / remove from PID controller so as not to have that attribute
         }
 
 
