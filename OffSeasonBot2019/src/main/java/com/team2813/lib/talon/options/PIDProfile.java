@@ -35,13 +35,13 @@ public @interface PIDProfile {
 	
 	
 	// TODO document
-	public enum Profile {
+	enum Profile {
 		PRIMARY(0),
 		SECONDARY(1);
 
 		public final int id;
 
-		private Profile(int id) {
+		Profile(int id) {
 			this.id = id;
 		}
 	}

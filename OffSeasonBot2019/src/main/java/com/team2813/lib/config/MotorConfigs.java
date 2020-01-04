@@ -55,8 +55,8 @@ public class MotorConfigs {
 
 //                talon.setPeakCurrentDuration(config.getPeakCurrentDuration());
         talon.setCurrLimit(config.getPeakCurrentLimit());
+        talon.enableVoltageCompensation();
 
-        talon.enableVoltageCompensation(config.setCompSaturationVoltage());
 
         talon.setOpenLoopRamp(config.getOpenLoopRampRate());
         talon.setClosedLoopRamp(config.getClosedLoopRampRate());
@@ -72,15 +72,16 @@ public class MotorConfigs {
 //				// FIXME remake limit switch stuff differently since it is called differently -- Grady 10/30 I'm not sure this is how it works for Spark Maxs
 //			}
 //
-//			for (com.team2813.lib.talon.options.SoftLimit softLimit : field.getAnnotationsByType(com.team2813.lib.talon.options.SoftLimit.class)) {
+//			for (com.team2813.lib.talon.options.SoftLimit softLimit : field.getAnnotationsByType(com.team2813co.lib.talon.options.SoftLimit.class)) {
 //				System.out.println("\tconfiguring soft limit " + softLimit.direction());
 //
 //				//FIXME remake limit switch stuff differently
 //			}
 
 
-        for (PIDControllerConfig pidController : config.getPidControllers()) {
-            PIDProfile.Profile slotID = PIDProfile.Profile(config.getPidControllers().indexOf(pidController));
+        for (PIDControllerConfig pidController :  config.getPidControllers()) {
+            PIDProfile.Profile slotID = config.getPidControllers().indexOf(pidController) == 0 ?
+                    PIDProfile.Profile.PRIMARY : PIDProfile.Profile.SECONDARY;
             talon.setPIDF(slotID, pidController.getP(), pidController.getI(),
                     pidController.getD(), pidController.getF());
             talon.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
@@ -92,8 +93,6 @@ public class MotorConfigs {
         Inverted inverted = config.getInverted();
         if (inverted != null)
             talon.setInverted(inverted == Inverted.INVERTED);
-        else
-            talon.setInverted(InvertType.NORMAL.inverted);
 
         for (FollowerConfig followerConfig : config.getFollowers()) {
             System.out.println(

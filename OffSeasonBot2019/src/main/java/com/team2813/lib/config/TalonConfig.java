@@ -21,6 +21,7 @@ public class TalonConfig extends MotorConfig {
     private boolean invertSensorPhase;
     private Inverted inverted;
     private List<FollowerConfig> followers = new ArrayList<>();
+    private List<PIDControllerConfig> pidControllers;
     private PeriodicFrame statusFrame; // cannot serialize into PeriodicFrame (see getStatusFrame)
     private int statusFramePeriod = 5;
     private VelocityMeasPeriod velocityMeasurementPeriod;
@@ -145,7 +146,8 @@ public class TalonConfig extends MotorConfig {
     }
 
 
-    public void getPidControllers() {
+    public List<PIDControllerConfig> getPidControllers() {
+        return pidControllers;
     }
 
     public Inverted getInverted() {
