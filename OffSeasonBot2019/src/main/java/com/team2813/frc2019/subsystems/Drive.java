@@ -2,7 +2,9 @@ package com.team2813.frc2019.subsystems;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
+import com.team2813.lib.auto.GeneratedTrajectory;
 import com.team2813.lib.auto.RamseteAuto;
+import com.team2813.lib.auto.RamseteTrajectory;
 import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.controls.Axis;
 import com.team2813.lib.controls.Button;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.util.Units;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.team2813.frc2019.Robot.gyro;
@@ -134,20 +137,30 @@ public class Drive extends Subsystem {
             prevLeft = LEFT.getEncoderPosition();
             prevRight = RIGHT.getEncoderPosition();
 
+            try { // define auto paths here
+                auto = new RamseteAuto(kinematics, List.of(
+                        new GeneratedTrajectory("Path 1", false),
+                        new GeneratedTrajectory("Path2", true)
+                ));
+            } catch (IOException e) {
+                System.out.println("Unable to read path files!");
+                auto = null; // disable auto
+                e.printStackTrace();
+            }
             // testing ramsete
 //            auto = new RamseteAuto(kinematics,
 //                    new Pose2d(0, 0, new Rotation2d(0)),
 //                    List.of(),
 //                    new Pose2d(2, 0, new Rotation2d(0)));
-            auto = new RamseteAuto(kinematics,
-                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-                    List.of(new Translation2d(2, 0),
-                            new Translation2d(2, -1.7)),
-                    new Pose2d(0, -1.7, Rotation2d.fromDegrees(180)));
-            auto.next(new RamseteAuto(kinematics,
-                    new Pose2d(0, -1.7, Rotation2d.fromDegrees(180)),
-                    List.of(new Translation2d(2, -1)),
-                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
+//            auto = new RamseteAuto(kinematics,
+//                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+//                    List.of(new Translation2d(2, 0),
+//                            new Translation2d(2, -1.7)),
+//                    new Pose2d(0, -1.7, Rotation2d.fromDegrees(180)));
+//            auto.next(new RamseteAuto(kinematics,
+//                    new Pose2d(0, -1.7, Rotation2d.fromDegrees(180)),
+//                    List.of(new Translation2d(2, -1)),
+//                    new Pose2d(4, -1.6, Rotation2d.fromDegrees(150)), true));
 
 //            auto = new RamseteAuto(kinematics,
 //                    new Pose2d(0, 0, Rotation2d.fromDegrees(0)),

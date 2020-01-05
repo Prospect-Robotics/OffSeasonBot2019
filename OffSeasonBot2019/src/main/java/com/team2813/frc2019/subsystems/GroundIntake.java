@@ -78,8 +78,13 @@ public class GroundIntake extends Subsystem {
 
     @Override
     protected void teleopControls_() {
-	    if (Subsystems.MAIN_INTAKE.mode == MainIntake.GamePiece.HATCH_PANEL) return;
-        TOGGLE_POSITION.whenPressed(this::togglePosition);
+//	    if (Subsystems.MAIN_INTAKE.mode == MainIntake.GamePiece.HATCH_PANEL) return;
+//        TOGGLE_POSITION.whenPressed(this::togglePosition);
+        try {
+            ROLLER.set(ControlMode.PercentOutput, -1);
+        } catch (CTREException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
