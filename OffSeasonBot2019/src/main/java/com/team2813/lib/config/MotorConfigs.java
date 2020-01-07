@@ -7,7 +7,6 @@ import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.TalonWrapper;
 import com.team2813.lib.talon.VictorWrapper;
-import com.team2813.lib.talon.options.InvertType;
 import com.team2813.lib.talon.PIDProfile;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Talon;
