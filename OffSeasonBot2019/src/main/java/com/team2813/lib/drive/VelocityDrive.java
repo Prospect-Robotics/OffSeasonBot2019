@@ -1,5 +1,6 @@
 package com.team2813.lib.drive;
 
+import com.team2813.frc2019.subsystems.Drive;
 import com.team2813.lib.config.PIDControllerConfig;
 import com.team2813.lib.config.SparkConfig;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
@@ -37,7 +38,11 @@ public class VelocityDrive {
 //        }
 //    }
 
-    public double getVelocityFromDemand(double demand) {
+    public DriveDemand getDemand(DriveDemand demand) {
+        return new DriveDemand(getVelocityFromDemand(demand.getLeft()), getVelocityFromDemand(demand.getRight()));
+    }
+
+    private double getVelocityFromDemand(double demand) {
         return maxVelocity * demand;
     }
 }

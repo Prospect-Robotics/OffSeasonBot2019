@@ -9,7 +9,7 @@ import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
 import com.team2813.lib.talon.CTREException;
 import com.team2813.lib.talon.VictorWrapper;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 
 public class GroundIntake extends Subsystem {
 
@@ -78,8 +78,13 @@ public class GroundIntake extends Subsystem {
 
     @Override
     protected void teleopControls_() {
-	    if (Subsystems.MAIN_INTAKE.mode == MainIntake.GamePiece.HATCH_PANEL) return;
-        TOGGLE_POSITION.whenPressed(this::togglePosition);
+//	    if (Subsystems.MAIN_INTAKE.mode == MainIntake.GamePiece.HATCH_PANEL) return;
+//        TOGGLE_POSITION.whenPressed(this::togglePosition);
+        try {
+            ROLLER.set(ControlMode.PercentOutput, -1);
+        } catch (CTREException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

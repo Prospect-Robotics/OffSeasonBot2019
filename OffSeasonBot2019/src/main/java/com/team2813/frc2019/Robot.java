@@ -8,19 +8,14 @@
 package com.team2813.frc2019;
 
 import com.ctre.phoenix.CANifier;
-import com.team2813.frc2019.loops.Loop;
-import com.team2813.frc2019.subsystems.Drive;
 import com.team2813.frc2019.subsystems.MainIntake;
 import com.team2813.frc2019.subsystems.Subsystem;
 import com.team2813.frc2019.subsystems.Subsystems;
 import com.team2813.lib.config.MotorConfigs;
 import com.team2813.lib.util.CrashTracker;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 
 import java.io.IOException;
 
@@ -40,6 +35,7 @@ public class Robot extends TimedRobot {
 	private static boolean batteryTooLow = false;
 
 	private CANifier caNifier = new CANifier(0);
+	public static Gyro gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -49,12 +45,15 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		try {
 			CrashTracker.logRobotInit();
-			MotorConfigs.read();
-			Subsystems.initializeSubsystems();
-			for (Subsystem subsystem : allSubsystems) {
-				LOOPER.addLoop(subsystem);
-				subsystem.zeroSensors();
-			}
+			MotorConfigs.read(() -> {
+				gyro.calibrate();
+				gyro.reset();
+				Subsystems.initializeSubsystems();
+				for (Subsystem subsystem : allSubsystems) {
+					LOOPER.addLoop(subsystem);
+					subsystem.zeroSensors();
+				}
+			});
 		} catch (IOException e) {
 			System.out.println("ERROR WHEN READING CONFIG");
 			e.printStackTrace();

@@ -9,7 +9,7 @@ import com.team2813.lib.util.CrashTrackingRunnable;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 
 
 

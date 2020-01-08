@@ -24,7 +24,7 @@ public class MotorConfigs {
 
     private static List<Integer> ids = new ArrayList<>();
 
-    public static void read() throws IOException {
+    public static void read(Runnable onFinish) throws IOException {
         File deployDirectory = Filesystem.getDeployDirectory();
         File configFile = new File(deployDirectory.getAbsolutePath() + "/motorConfig.yaml");
 
@@ -35,6 +35,8 @@ public class MotorConfigs {
         motorConfigs.getVictors().forEach(((s, victorConfig) -> victors.put(s, initializeVictor(victorConfig))));
 
         System.out.println("Successful!");
+
+        onFinish.run();
     }
 
     private static CANSparkMaxWrapper initializeSpark(SparkConfig config) {
@@ -48,6 +50,7 @@ public class MotorConfigs {
         System.out.println("Configuring " + config.getSubsystemName());
 
         CANSparkMaxWrapper spark = new CANSparkMaxWrapper(config.getDeviceNumber(), config.getSubsystemName(), config.getType().getValue());
+        spark.setCANTimeout(5000);
 
         try {
             spark.factoryDefault();
@@ -86,6 +89,8 @@ public class MotorConfigs {
                 spark.getPIDController().setSmartMotionMaxVelocity(pidController.getMaxVelocity(), slotID);
                 spark.getPIDController().setSmartMotionMaxAccel(pidController.getMaxAcceleration(), slotID);
                 spark.getPIDController().setSmartMotionMinOutputVelocity(pidController.getMinVelocity(), slotID);
+
+                spark.getPIDController().setOutputRange(-1, 1);
             }
 
 

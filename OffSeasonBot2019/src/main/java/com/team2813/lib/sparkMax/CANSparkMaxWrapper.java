@@ -596,6 +596,10 @@ public class CANSparkMaxWrapper extends CANSparkMax {
 			super.setInverted(false);
 	}
 
+	public void zero() {
+		getEncoder().setPosition(0);
+	}
+
 	public SparkConfig getConfig() {
 		return config;
 	}
