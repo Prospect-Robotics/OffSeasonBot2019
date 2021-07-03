@@ -1,4 +1,4 @@
-package com.team2813.lib.talon;
+package com.team2813.lib.ctre;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -38,28 +38,28 @@ public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
 	}
 
 	public void setStatusFramePeriod(StatusFrameEnhanced frame, int periodMs) throws CTREException {
-		throwIfNotOk(motorController.setStatusFramePeriod(frame, periodMs, timeoutMode.value));
+		throwIfNotOk(motorController.setStatusFramePeriod(frame, periodMs, timeoutMode.valueMs));
 	}
 
 	/**
 	 * @param limit Amperes to limit
 	 */
 	public void setContinuousCurrentLimit(int limit) throws CTREException {
-		throwIfNotOk(motorController.configContinuousCurrentLimit(limit, timeoutMode.value));
+		throwIfNotOk(motorController.configContinuousCurrentLimit(limit, timeoutMode.valueMs));
 	}
 
 	/**
 	 * @param limit Amperes to limit
 	 */
 	public void setPeakCurrentLimit(int limit) throws CTREException {
-		throwIfNotOk(motorController.configPeakCurrentLimit(limit, timeoutMode.value));
+		throwIfNotOk(motorController.configPeakCurrentLimit(limit, timeoutMode.valueMs));
 	}
 
 	/**
 	 * @param duration How long to allow current-draw past peak limit. (in milliseconds)
 	 */
 	public void setPeakCurrentDuration(int duration) throws CTREException {
-		throwIfNotOk(motorController.configPeakCurrentDuration(duration, timeoutMode.value));
+		throwIfNotOk(motorController.configPeakCurrentDuration(duration, timeoutMode.valueMs));
 	}
 	
 	//#region Sensor collection wrappers
@@ -77,7 +77,7 @@ public class TalonWrapper extends BaseMotorControllerWrapper<TalonSRX> {
 	//#endregion
 
 	public void setReverseLimitSwitchSource(LimitSwitchSource type, LimitSwitchNormal normalOpenOrClose) throws CTREException {
-		throwIfNotOk(motorController.configReverseLimitSwitchSource(type, normalOpenOrClose, timeoutMode.value));
+		throwIfNotOk(motorController.configReverseLimitSwitchSource(type, normalOpenOrClose, timeoutMode.valueMs));
 	}
 
 	public void setLimitSwitchSource(LimitDirection direction, LimitSwitchSource type, LimitSwitchNormal normalOpenOrClose) throws CTREException {

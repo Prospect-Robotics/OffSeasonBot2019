@@ -1,4 +1,4 @@
-package com.team2813.lib.talon;
+package com.team2813.lib.ctre;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
@@ -38,7 +38,6 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	 * @return value
 	 * @throws CTREException - if talon had error code
 	 */
-	//TODO better name for this
 	protected <T> T throwIfNotOkElseReturn(T value) throws CTREException {
 		throwLastError();
 		return value;
@@ -92,6 +91,11 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region Invert behavior
 
 
+	/**
+	 * Invert the encoder
+	 * @param inverted
+	 * @throws CTREException
+	 */
 	public void setSensorPhaseInverted(boolean inverted) throws CTREException {
 		motorController.setSensorPhase(inverted);
 		throwLastError();
@@ -121,7 +125,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region Factory Default Configuration
 
 	public void setFactoryDefaults() throws CTREException {
-		throwIfNotOk(motorController.configFactoryDefault(timeoutMode.value));
+		throwIfNotOk(motorController.configFactoryDefault(timeoutMode.valueMs));
 	}
 
 	// #endregion
@@ -129,35 +133,35 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region general output shaping
 
 	public void setOpenLoopRamp(double seconds) throws CTREException {
-		throwIfNotOk(motorController.configOpenloopRamp(seconds, timeoutMode.value));
+		throwIfNotOk(motorController.configOpenloopRamp(seconds, timeoutMode.valueMs));
 	}
 
 	public void setClosedLoopRamp(double seconds) throws CTREException {
-		throwIfNotOk(motorController.configClosedloopRamp(seconds, timeoutMode.value));
+		throwIfNotOk(motorController.configClosedloopRamp(seconds, timeoutMode.valueMs));
 	}
 
 
 	public void setPeakOutputForward(double percentOut) throws CTREException {
-		throwIfNotOk(motorController.configPeakOutputForward(percentOut, timeoutMode.value));
+		throwIfNotOk(motorController.configPeakOutputForward(percentOut, timeoutMode.valueMs));
 	}
 
 
 	public void setPeakOutputReverse(double percentOut) throws CTREException {
-		throwIfNotOk(motorController.configPeakOutputReverse(percentOut, timeoutMode.value));
+		throwIfNotOk(motorController.configPeakOutputReverse(percentOut, timeoutMode.valueMs));
 	}
 
 
 	public void setNominalOutputForward(double percentOut) throws CTREException {
-		throwIfNotOk(motorController.configNominalOutputForward(percentOut, timeoutMode.value));
+		throwIfNotOk(motorController.configNominalOutputForward(percentOut, timeoutMode.valueMs));
 	}
 
 
 	public void setNominalOutputReverse(double percentOut) throws CTREException {
-		throwIfNotOk(motorController.configNominalOutputReverse(percentOut, timeoutMode.value));
+		throwIfNotOk(motorController.configNominalOutputReverse(percentOut, timeoutMode.valueMs));
 	}
 
 	public void setNeutralDeadband(double percentDeadband) throws CTREException {
-		throwIfNotOk(motorController.configNeutralDeadband(percentDeadband, timeoutMode.value));
+		throwIfNotOk(motorController.configNeutralDeadband(percentDeadband, timeoutMode.valueMs));
 	}
 
 	// #endregion
@@ -166,12 +170,12 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 
 
 	public void setVoltageCompensationSaturation(double voltage) throws CTREException {
-		throwIfNotOk(motorController.configVoltageCompSaturation(voltage, timeoutMode.value));
+		throwIfNotOk(motorController.configVoltageCompSaturation(voltage, timeoutMode.valueMs));
 	}
 
 
 	public void setVoltageMeasurementFilter(int filterWindowSamples) throws CTREException {
-		throwIfNotOk(motorController.configVoltageMeasurementFilter(filterWindowSamples, timeoutMode.value));
+		throwIfNotOk(motorController.configVoltageMeasurementFilter(filterWindowSamples, timeoutMode.valueMs));
 	}
 
 
@@ -217,31 +221,51 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region Sensor Selection	
 
 	public void setSelectedFeedbackSensor(RemoteFeedbackDevice feedbackDevice, PidIdx pidIdx) throws CTREException {
-		throwIfNotOk(motorController.configSelectedFeedbackSensor(feedbackDevice, pidIdx.value, timeoutMode.value));
+		throwIfNotOk(motorController.configSelectedFeedbackSensor(feedbackDevice, pidIdx.value, timeoutMode.valueMs));
 	}
 	
 
 	public void setSelectedFeedbackSensor(FeedbackDevice feedbackDevice, PidIdx pidIdx) throws CTREException {
-		throwIfNotOk(motorController.configSelectedFeedbackSensor(feedbackDevice, pidIdx.value, timeoutMode.value));
+		throwIfNotOk(motorController.configSelectedFeedbackSensor(feedbackDevice, pidIdx.value, timeoutMode.valueMs));
 	}
 	
 	public void setSelectedFeedbackCoefficient(double coefficient, PidIdx pidIdx) throws CTREException {
-		throwIfNotOk(motorController.configSelectedFeedbackCoefficient(coefficient, pidIdx.value, timeoutMode.value));
+		throwIfNotOk(motorController.configSelectedFeedbackCoefficient(coefficient, pidIdx.value, timeoutMode.valueMs));
 	}
 	
 
 	public void setRemoteFeedbackFilter(int deviceID, RemoteSensorSource remoteSensorSource, int remoteOrdinal) throws CTREException {
-		throwIfNotOk(motorController.configRemoteFeedbackFilter(deviceID, remoteSensorSource, remoteOrdinal, timeoutMode.value));
+		throwIfNotOk(motorController.configRemoteFeedbackFilter(deviceID, remoteSensorSource, remoteOrdinal, timeoutMode.valueMs));
 	}
-	
 
+
+	/**
+	 * Select what sensor term should be bound to switch feedback device.
+	 * Sensor Sum = Sensor Sum Term 0 - Sensor Sum Term 1
+	 * Sensor Difference = Sensor Diff Term 0 - Sensor Diff Term 1
+	 * The four terms are specified with this routine.  Then Sensor Sum/Difference
+	 * can be selected for closed-looping.
+	 *
+	 * @param sensorTerm Which sensor term to bind to a feedback source.
+	 * @param feedbackDevice The sensor signal to attach to sensorTerm.
+	 */
 	public void setSensorTerm(SensorTerm sensorTerm, FeedbackDevice feedbackDevice) throws CTREException {
-		throwIfNotOk(motorController.configSensorTerm(sensorTerm, feedbackDevice, timeoutMode.value));
+		throwIfNotOk(motorController.configSensorTerm(sensorTerm, feedbackDevice, timeoutMode.valueMs));
 	}
-	
 
+
+	/**
+	 * Select what sensor term should be bound to switch feedback device.
+	 * Sensor Sum = Sensor Sum Term 0 - Sensor Sum Term 1
+	 * Sensor Difference = Sensor Diff Term 0 - Sensor Diff Term 1
+	 * The four terms are specified with this routine.  Then Sensor Sum/Difference
+	 * can be selected for closed-looping.
+	 *
+	 * @param sensorTerm Which sensor term to bind to a feedback source.
+	 * @param feedbackDevice The sensor signal to attach to sensorTerm.
+	 */
 	public void setSensorTerm(SensorTerm sensorTerm, RemoteFeedbackDevice feedbackDevice) throws CTREException {
-		throwIfNotOk(motorController.configSensorTerm(sensorTerm, feedbackDevice, timeoutMode.value));
+		throwIfNotOk(motorController.configSensorTerm(sensorTerm, feedbackDevice, timeoutMode.valueMs));
 	}
 	
 	// #endregion
@@ -265,7 +289,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	}
 	
 	public void setSelectedSensorPosition(PidIdx pidIdx, int sensorPos) throws CTREException {
-		throwIfNotOk(motorController.setSelectedSensorPosition(sensorPos, pidIdx.value, timeoutMode.value));
+		throwIfNotOk(motorController.setSelectedSensorPosition(sensorPos, pidIdx.value, timeoutMode.valueMs));
 	}
 	
 	public void setSelectedSensorPosition(int sensorPos) throws CTREException {
@@ -287,23 +311,23 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	}
 	
 	public void setStatusFramePeriod(int frameValue, int periodMs) throws CTREException {
-		throwIfNotOk(motorController.setStatusFramePeriod(frameValue, periodMs, timeoutMode.value));
+		throwIfNotOk(motorController.setStatusFramePeriod(frameValue, periodMs, timeoutMode.valueMs));
 	}
 	
 	public void setStatusFramePeriod(StatusFrame frame, int periodMs) throws CTREException {
-		throwIfNotOk(motorController.setStatusFramePeriod(frame, periodMs, timeoutMode.value));
+		throwIfNotOk(motorController.setStatusFramePeriod(frame, periodMs, timeoutMode.valueMs));
 	}
 	
 	public int getStatusFramePeriod(int frameValue) throws CTREException {
-		return throwIfNotOkElseReturn(motorController.getStatusFramePeriod(frameValue, timeoutMode.value));
+		return throwIfNotOkElseReturn(motorController.getStatusFramePeriod(frameValue, timeoutMode.valueMs));
 	}
 	
 	public int getStatusFramePeriod(StatusFrame frame) throws CTREException {
-		return throwIfNotOkElseReturn(motorController.getStatusFramePeriod(frame, timeoutMode.value));
+		return throwIfNotOkElseReturn(motorController.getStatusFramePeriod(frame, timeoutMode.valueMs));
 	}
 	
 	public int getStatusFramePeriod(StatusFrameEnhanced frame) throws CTREException {
-		return throwIfNotOkElseReturn(motorController.getStatusFramePeriod(frame, timeoutMode.value));
+		return throwIfNotOkElseReturn(motorController.getStatusFramePeriod(frame, timeoutMode.valueMs));
 	}
 	
 	// #endregion
@@ -312,12 +336,12 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	
 
 	public void setVelocityMeasurementPeriod(VelocityMeasPeriod period) throws CTREException {
-		throwIfNotOk(motorController.configVelocityMeasurementPeriod(period, timeoutMode.value));
+		throwIfNotOk(motorController.configVelocityMeasurementPeriod(period, timeoutMode.valueMs));
 	}
 	
 
 	public void setVelocityMeasurementWindow(VelocityMeasurementWindow windowSize) throws CTREException {
-		throwIfNotOk(motorController.configVelocityMeasurementWindow(windowSize.value, timeoutMode.value));
+		throwIfNotOk(motorController.configVelocityMeasurementWindow(windowSize.value, timeoutMode.valueMs));
 	}
 	
 	// #endregion
@@ -326,19 +350,19 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 
 	public void setForwardLimitSwitchSource(RemoteLimitSwitchSource type, LimitSwitchNormal normalOpenOrClose, int deviceID) throws CTREException {
 		throwIfNotOk(
-			motorController.configForwardLimitSwitchSource(type, normalOpenOrClose, deviceID, timeoutMode.value)
+			motorController.configForwardLimitSwitchSource(type, normalOpenOrClose, deviceID, timeoutMode.valueMs)
 		);
 	}
 	
 	public void setReverseLimitSwitchSource(RemoteLimitSwitchSource type, LimitSwitchNormal normalOpenOrClose, int deviceID) throws CTREException {
 		throwIfNotOk(
-			motorController.configReverseLimitSwitchSource(type, normalOpenOrClose, deviceID, timeoutMode.value)
+			motorController.configReverseLimitSwitchSource(type, normalOpenOrClose, deviceID, timeoutMode.valueMs)
 		);
 	}
 	
 
 	public void setForwardLimitSwitchSource(LimitSwitchSource type, LimitSwitchNormal normalOpenOrClose) throws CTREException {
-		throwIfNotOk(motorController.configForwardLimitSwitchSource(type, normalOpenOrClose, timeoutMode.value));
+		throwIfNotOk(motorController.configForwardLimitSwitchSource(type, normalOpenOrClose, timeoutMode.valueMs));
 	}
 	
 	// #endregion
@@ -346,11 +370,11 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region Forward soft limit
 	
 	public void setForwardSoftLimitThreshold(int threshold) throws CTREException {
-		throwIfNotOk(motorController.configForwardSoftLimitThreshold(threshold, timeoutMode.value));
+		throwIfNotOk(motorController.configForwardSoftLimitThreshold(threshold, timeoutMode.valueMs));
 	}
 
 	public void setForwardSoftLimitEnable(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configForwardSoftLimitEnable(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configForwardSoftLimitEnable(enable, timeoutMode.valueMs));
 	}
 
 	public void disableForwardSoftLimit() throws CTREException {
@@ -379,12 +403,12 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	 * @param threshold Reverse Sensor Position Limit (in raw sensor units).
 	 */
 	public void setReverseSoftLimitThreshold(int threshold) throws CTREException {
-		throwIfNotOk(motorController.configReverseSoftLimitThreshold(threshold, timeoutMode.value));
+		throwIfNotOk(motorController.configReverseSoftLimitThreshold(threshold, timeoutMode.valueMs));
 	}
 
 
 	public void setReverseSoftLimitEnable(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configReverseSoftLimitEnable(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configReverseSoftLimitEnable(enable, timeoutMode.valueMs));
 	}
 
 	public void disableReverseSoftLimit() throws CTREException {
@@ -416,19 +440,21 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region Motion Profile Settings used in Motion Magic and Motion Profile
 	
 	/**
+	 * Set the peak velocity in Motion Magic mode
 	 * @param velocity - sensor units / 100ms
 	 * @throws CTREException
 	 */
 	public void setMotionMagicCruiseVelocity(int velocity) throws CTREException {
-		throwIfNotOk(motorController.configMotionCruiseVelocity(velocity, timeoutMode.value));
+		throwIfNotOk(motorController.configMotionCruiseVelocity(velocity, timeoutMode.valueMs));
 	}
 	
 	/**
+	 * Set the acceleration of the Motion Magic controller
 	 * @param acceleration - raw sensor units per 100 ms per second
 	 * @throws CTREException
 	 */
 	public void setMotionMagicAcceleration(int acceleration) throws CTREException {
-		throwIfNotOk(motorController.configMotionAcceleration(acceleration, timeoutMode.value));
+		throwIfNotOk(motorController.configMotionAcceleration(acceleration, timeoutMode.valueMs));
 	}
 	
 	// #endregion
@@ -471,7 +497,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	}
 	
 	public void clearMotionProfileHasUnderrun() throws CTREException {
-		throwIfNotOk(motorController.clearMotionProfileHasUnderrun(timeoutMode.value));
+		throwIfNotOk(motorController.clearMotionProfileHasUnderrun(timeoutMode.valueMs));
 	}
 	
 	public void setMotionControlFramePeriod(int periodMs) throws CTREException {
@@ -483,11 +509,11 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	 * @throws CTREException
 	 */
 	public void setMotionProfileTrajectoryPeriod(int baseTrajectoryDuration) throws CTREException {
-		throwIfNotOk(motorController.configMotionProfileTrajectoryPeriod(baseTrajectoryDuration, timeoutMode.value));
+		throwIfNotOk(motorController.configMotionProfileTrajectoryPeriod(baseTrajectoryDuration, timeoutMode.valueMs));
 	}
 	
 	public void setMotionProfileTrajectoryInterpolation(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configMotionProfileTrajectoryInterpolationEnable(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configMotionProfileTrajectoryInterpolationEnable(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableMotionProfileTrajectoryInterpolation() throws CTREException {
@@ -503,7 +529,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// #region Feedback Device Integration Settings
 	
 	public void setFeedbackNotContinuous(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configFeedbackNotContinuous(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configFeedbackNotContinuous(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableFeedbackNotContinuous() throws CTREException {
@@ -516,7 +542,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	
 	
 	public void setRemoteSensorClosedLoopDisableNeutralOnLOS(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configRemoteSensorClosedLoopDisableNeutralOnLOS(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configRemoteSensorClosedLoopDisableNeutralOnLOS(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableRemoteSensorClosedLoopDisableNeutralOnLOS() throws CTREException {
@@ -526,14 +552,20 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	public void disableRemoteSensorClosedLoopDisableNeutralOnLOS() throws CTREException {
 		setRemoteSensorClosedLoopDisableNeutralOnLOS(false);
 	}
-	
+
+	/**
+	 * Reset selected feedback sensor (encoder) on a limit
+	 * @param direction
+	 * @param clearOnLimit
+	 * @throws CTREException
+	 */
 	public void setClearPositionOnLimit(LimitDirection direction, boolean clearOnLimit) throws CTREException {
 		if (direction == LimitDirection.FORWARD) setClearPositionOnLimitF(clearOnLimit);
 		else if (direction == LimitDirection.REVERSE) setClearPositionOnLimitR(clearOnLimit);
 	}
 	
 	public void setClearPositionOnLimitF(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configClearPositionOnLimitF(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configClearPositionOnLimitF(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableClearPositionOnLimitF() throws CTREException {
@@ -546,7 +578,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	
 	
 	public void setClearPositionOnLimitR(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configClearPositionOnLimitR(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configClearPositionOnLimitR(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableClearPositionOnLimitR() throws CTREException {
@@ -558,7 +590,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	}
 	
 	public void setClearPositionOnQuadIdx(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configClearPositionOnQuadIdx(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configClearPositionOnQuadIdx(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableClearPositionOnQuadIdx() throws CTREException {
@@ -571,7 +603,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	
 	
 	public void setLimitSwitchDisableNeutralOnLOS(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configLimitSwitchDisableNeutralOnLOS(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configLimitSwitchDisableNeutralOnLOS(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableLimitSwitchDisableNeutralOnLOS() throws CTREException {
@@ -584,7 +616,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	
 	
 	public void setSoftLimitDisableNeutralOnLOS(boolean enable) throws CTREException {
-		throwIfNotOk(motorController.configSoftLimitDisableNeutralOnLOS(enable, timeoutMode.value));
+		throwIfNotOk(motorController.configSoftLimitDisableNeutralOnLOS(enable, timeoutMode.valueMs));
 	}
 	
 	public void enableSoftLimitDisableNeutralOnLOS() throws CTREException {
@@ -597,18 +629,22 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	
 	
 	public void setPulseWidthPeriodEdgesPerRotation(int edgesPerRotation) throws CTREException {
-		throwIfNotOk(motorController.configPulseWidthPeriod_EdgesPerRot(edgesPerRotation, timeoutMode.value));
+		throwIfNotOk(motorController.configPulseWidthPeriod_EdgesPerRot(edgesPerRotation, timeoutMode.valueMs));
 	}
 	
 	
 	public void setPulseWidthPeriodFilterWindowSamples(int samples) throws CTREException {
-		throwIfNotOk(motorController.configPulseWidthPeriod_EdgesPerRot(samples, timeoutMode.value));
+		throwIfNotOk(motorController.configPulseWidthPeriod_EdgesPerRot(samples, timeoutMode.valueMs));
 	}
 	
 	// #endregion
 
 	// #region Error
-	
+
+	/**
+	 * Get most recent error from motor controller
+	 * @return
+	 */
 	public ErrorCode getLastError() {
 		return motorController.getLastError();
 	}
@@ -627,22 +663,22 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	// FIXME: 12/28/2019 Need to rewrite PIDProfile.Profile for Talons
 
 	public void setP(PIDProfile.Profile slot, double p) throws CTREException {
-		throwIfNotOk(motorController.config_kP(slot.id, p, timeoutMode.value));
+		throwIfNotOk(motorController.config_kP(slot.id, p, timeoutMode.valueMs));
 	}
 
 
 	public void setI(PIDProfile.Profile slot, double i) throws CTREException {
-		throwIfNotOk(motorController.config_kI(slot.id, i, timeoutMode.value));
+		throwIfNotOk(motorController.config_kI(slot.id, i, timeoutMode.valueMs));
 	}
 
 
 	public void setD(PIDProfile.Profile slot, double d) throws CTREException {
-		throwIfNotOk(motorController.config_kD(slot.id, d, timeoutMode.value));
+		throwIfNotOk(motorController.config_kD(slot.id, d, timeoutMode.valueMs));
 	}
 
 
 	public void setF(PIDProfile.Profile slot, double f) throws CTREException {
-		throwIfNotOk(motorController.config_kF(slot.id, f, timeoutMode.value));
+		throwIfNotOk(motorController.config_kF(slot.id, f, timeoutMode.valueMs));
 	}
 
 	public void setPIDF(PIDProfile.Profile slot, double p, double i, double d, double f) throws CTREException {
@@ -654,16 +690,16 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 
 
 	public void setMaxIntegralAccumulator(PIDProfile.Profile profile, double iaccum) throws CTREException {
-		throwIfNotOk(motorController.configMaxIntegralAccumulator(profile.id, iaccum, timeoutMode.value));
+		throwIfNotOk(motorController.configMaxIntegralAccumulator(profile.id, iaccum, timeoutMode.valueMs));
 	}
 
 	public void setIntegralZone(PIDProfile.Profile profile, int izone) throws CTREException {
-		throwIfNotOk(motorController.config_IntegralZone(profile.id, izone, timeoutMode.value));
+		throwIfNotOk(motorController.config_IntegralZone(profile.id, izone, timeoutMode.valueMs));
 	}
 
 
 	public void setAllowableClosedLoopError(PIDProfile.Profile profile, int allowableError) throws CTREException {
-		throwIfNotOk(motorController.configAllowableClosedloopError(profile.id, allowableError, timeoutMode.value));
+		throwIfNotOk(motorController.configAllowableClosedloopError(profile.id, allowableError, timeoutMode.valueMs));
 	}
 
 
@@ -671,7 +707,7 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 
 
 	public void clearStickyFaults() throws CTREException {
-		throwIfNotOk(motorController.clearStickyFaults(timeoutMode.value));
+		throwIfNotOk(motorController.clearStickyFaults(timeoutMode.valueMs));
 	}
 	
 
@@ -727,10 +763,24 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 	public void disableOverrideSoftLimits() throws CTREException {
 		setOverrideSoftLimits(false);
 	}
-	
 
+	/**
+	 * Sets a parameter. Generally this is not used. This can be utilized in -
+	 * Using new features without updating API installation. - Errata
+	 * workarounds to circumvent API implementation. - Allows for rapid testing
+	 * / unit testing of firmware.
+	 *
+	 * @param param
+	 *            Parameter enumeration.
+	 * @param value
+	 *            Value of parameter.
+	 * @param subValue
+	 *            Subvalue for parameter. Maximum value of 255.
+	 * @param ordinal
+	 *            Ordinal of parameter.
+	 */
 	public void setParameter(ParamEnum param, double value, int subValue, int ordinal) throws CTREException {
-		throwIfNotOk(motorController.configSetParameter(param, value, subValue, ordinal, timeoutMode.value));
+		throwIfNotOk(motorController.configSetParameter(param, value, subValue, ordinal, timeoutMode.valueMs));
 	}
 
 	public void setDirectionParameterForLimit(LimitDirection direction, double value, int subValue, int ordinal, boolean clearOnLimit) throws CTREException {
@@ -740,23 +790,10 @@ public abstract class BaseMotorControllerWrapper<Controller extends BaseMotorCon
 		}
 	}
 
-	// TODO document
-	public enum TimeoutMode {
-		/** Longer timeout, used for constructors */
-		CONSTRUCTING(100),
-		/** Shorter timeout, used for on the fly updates */
-		RUNNING(20),
-		NO_TIMEOUT(0);
-
-		final int value;
-
-		private TimeoutMode(int value) {
-			this.value = value;
-		}
-	}
-
-	//TODO document
-	public enum PidIdx{ //FIXME give this a name that reflects w/e it actually does
+	/**
+	 * PID ID Slots: Primary 0; Auxiliary 1
+	 */
+	public enum PidIdx { //FIXME give this a name that reflects w/e it actually does
 		PRIMARY_CLOSED_LOOP(0),
 		AUXILIARY_CLOSED_LOOP(1);
 		

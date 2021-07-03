@@ -2,7 +2,7 @@ package com.team2813.frc2019.subsystems;
 
 import com.team2813.frc2019.loops.Loop;
 import com.team2813.lib.sparkMax.SparkMaxException;
-import com.team2813.lib.talon.CTREException;
+import com.team2813.lib.ctre.CTREException;
 
 /**
  * TODO rewrite this documentation block

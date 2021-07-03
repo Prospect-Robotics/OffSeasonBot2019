@@ -11,7 +11,7 @@ import com.team2813.lib.drive.DriveDemand;
 import com.team2813.lib.drive.VelocityDrive;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
-import com.team2813.lib.talon.CTREException;
+import com.team2813.lib.ctre.CTREException;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;

@@ -5,6 +5,10 @@ public class WaitAction implements Action {
 	private double duration;
 	private double startTime;
 
+	/**
+	 * Create a new action to wait an amount of time in seconds
+	 * @param durationInSeconds
+	 */
 	public WaitAction(double durationInSeconds) {
 		this.duration = durationInSeconds;
 	}

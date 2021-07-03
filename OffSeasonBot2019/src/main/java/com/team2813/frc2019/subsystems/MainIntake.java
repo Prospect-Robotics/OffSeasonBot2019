@@ -7,7 +7,7 @@ import com.team2813.lib.solenoid.PistonSolenoid;
 import com.team2813.lib.solenoid.PistonSolenoid.PistonState;
 import com.team2813.lib.sparkMax.CANSparkMaxWrapper;
 import com.team2813.lib.sparkMax.SparkMaxException;
-import com.team2813.lib.talon.CTREException;
+import com.team2813.lib.ctre.CTREException;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static com.team2813.frc2019.subsystems.Subsystems.GROUND_INTAKE;

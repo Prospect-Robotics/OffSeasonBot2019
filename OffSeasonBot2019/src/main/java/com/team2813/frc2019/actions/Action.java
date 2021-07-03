@@ -23,5 +23,10 @@ public interface Action {
 	 */
 	void end(double timestamp);
 
+	/**
+	 * Returns whether action should be removed when robot has been disabled.
+	 *
+	 * @return Always returns false
+	 */
 	default boolean getRemoveOnDisabled() {return false;}
 }
